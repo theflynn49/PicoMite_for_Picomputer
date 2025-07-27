@@ -21,9 +21,9 @@ OPTION DEFAULT FONT 7, 1
 
 KEYBOARD
 --------
-Shit->DOWN : select LowerCase (then the shift ket acts more like an ALT one, selectiong symbols)
-SHIFT-UP : select UpperCase (then the shift ket acts more like an ALT one, selectiong symbols)
-SHIFT-RIGHT : select Symbols (then the shift ket acts more like an CTRL one, selectiong control charaters)
+<br>Shit->DOWN : select LowerCase (then the shift ket acts more like an ALT one, selectiong symbols)
+<br>SHIFT-UP : select UpperCase (then the shift ket acts more like an ALT one, selectiong symbols)
+<br>SHIFT-RIGHT : select Symbols (then the shift ket acts more like an CTRL one, selectiong control charaters)
 
 RECOMPILING
 -----------
