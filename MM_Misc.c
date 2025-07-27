@@ -49,6 +49,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #ifdef rp2350
 #include "pico/rand.h"
 #endif
+#ifdef PICOMPUTER 
+#include "KMatrix.h"
+#endif
 #ifdef USBKEYBOARD
 extern int caps_lock;
 extern int num_lock;
@@ -6120,7 +6123,10 @@ int __not_in_flash_func(check_interrupt)(void) {
 #endif
 #ifndef USBKEYBOARD
     if(Option.KeyboardConfig)CheckKeyboard();
-#endif    
+#endif
+#ifdef PICOMPUTER 
+    (void)getMatrix(1) ;
+#endif   
     if(!InterruptUsed) return 0;                                    // quick exit if there are no interrupts set
     if(InterruptReturn != NULL || CurrentLinePtr == NULL) return 0; // skip if we are in an interrupt or in immediate mode
     return checkdetailinterrupts();

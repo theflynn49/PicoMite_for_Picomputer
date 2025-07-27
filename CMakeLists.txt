@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.13)
 # Valid builds are PICO, PICOUSB, VGA, VGAUSB, HDMI(rp2350 only), HDMIUSB(rp2350 only), WEB
 
-set(COMPILE VGA)
+#set(COMPILE VGA)
+set(COMPILE PICO)
 
 if (COMPILE STREQUAL "HDMI" OR COMPILE STREQUAL "WEBRP2350" OR COMPILE STREQUAL "HDMIUSB"  OR COMPILE STREQUAL "VGARP2350"  OR COMPILE STREQUAL "VGAUSBRP2350"  OR COMPILE STREQUAL "PICORP2350"  OR COMPILE STREQUAL "PICOUSBRP2350" )
 	set(PICO_PLATFORM rp2350)
@@ -53,6 +54,7 @@ add_executable(PicoMite
 	GPS.c
 	Audio.c
 	CFunction.c
+	KMatrix.c
     picojpeg.c 
     lfs.c
     lfs_util.c
@@ -155,6 +157,7 @@ target_compile_options(PicoMite PRIVATE -DNDEBUG
 										-DPICO_FLASH_SIZE_BYTES=16777216
 										-DPICO_CORE1_STACK_SIZE=0x00
 										-DPICO_MALLOC_PANIC
+										-DPICOMPUTER
 										-O2
 										-Wall)
 # all RP2350 variants

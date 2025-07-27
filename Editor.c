@@ -1003,7 +1003,8 @@ void FullScreenEditor(int xx, int yy, char *fname, int edit_buff_size, bool cmdf
               case F1:             // Save and exit
               case CTRLKEY('W'):   // Save, exit and run
               case F2:             // Save, exit and run
-//                            if(Option.continuation){
+//                            if(Option.continuation)
+                              {
                                 int line=0;
                                 int i=find_longest_line_length((char *)EdBuff, &line);
                                 if(i>255){
@@ -1012,7 +1013,7 @@ void FullScreenEditor(int xx, int yy, char *fname, int edit_buff_size, bool cmdf
                                     editDisplayMsg((unsigned char *)buff);
                                     break;
                                 }
-//                            }
+                              }
                             c=buf[0];
                             PrintString("\033[?1000l");                         // Tera Term turn off mouse click report in vt200 mode
                             PrintString("\0338\033[2J\033[H");                  // vt100 clear screen and home cursor

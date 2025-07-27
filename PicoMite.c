@@ -45,6 +45,10 @@ extern "C" {
 #include "pico/unique_id.h"
 #include "hardware/pwm.h"
 extern void start_i2s(int pio, int sm);
+#ifdef PICOMPUTER 
+#include "KMatrix.h"
+#endif
+
 #ifdef rp2350
 #include "hardware/structs/qmi.h"
 #endif
@@ -556,6 +560,9 @@ int __not_in_flash_func(getConsole)(void) {
         c = ConsoleRxBuf[ConsoleRxBufTail];
         ConsoleRxBufTail = (ConsoleRxBufTail + 1) % CONSOLE_RX_BUF_SIZE;   // advance the head of the queue
 	}
+#ifdef PICOMPUTER 
+    if (c==-1) c=getMatrix(0) ;
+#endif
     return c;
 }
 
@@ -1436,6 +1443,9 @@ int MMgetchar(void) {
 	do {
 		ShowCursor(1);
 		c=MMInkey();
+#ifdef PICOMPUTER 
+		if (c==-1) c=getMatrix(0) ;
+#endif
 	} while(c == -1);
 	ShowCursor(0);
 	return c;

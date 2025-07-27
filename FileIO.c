@@ -56,6 +56,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #ifdef rp2350
 #include "hardware/structs/qmi.h"
 #endif
+#ifdef PICOMPUTER 
+#include "KMatrix.h"
+#endif
 extern const uint8_t *flash_target_contents;
 extern const uint8_t *flash_option_contents;
 extern const uint8_t *SavedVarsFlash;
@@ -4315,7 +4318,10 @@ void MIPS16 cmd_files(void)
                         c = ConsoleRxBuf[ConsoleRxBufTail];
                         ConsoleRxBufTail = (ConsoleRxBufTail + 1) % CONSOLE_RX_BUF_SIZE; // advance the head of the queue
                     }
-                } while (c == -1);
+#ifdef PICOMPUTER 
+		    if (c==-1) c=getMatrix(0) ;
+#endif
+		} while (c == -1);
                 ShowCursor(0);
                 MMPrintString("\r                 \r");
     			if(Option.DISPLAY_CONSOLE){ClearScreen(gui_bcolour);CurrentX=0;CurrentY=0;}
