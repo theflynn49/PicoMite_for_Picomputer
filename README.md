@@ -1,4 +1,4 @@
-# PicoMite for Boboricius' PICOMPUTER
+# PicoMite for Bobricius' PICOMPUTER
 <br>
 <img width="600" height="450" alt="IMG_Picomputer" src="https://github.com/user-attachments/assets/1c327f12-428c-4841-b9d6-982cc56d3df3" /><br>
 
@@ -21,9 +21,9 @@ OPTION DEFAULT FONT 7, 1
 
 KEYBOARD
 --------
-<br>SHIFT->DOWN : select LowerCase (then the shift ket acts more like an ALT one, selectiong symbols)
-<br>SHIFT-UP : select UpperCase (then the shift ket acts more like an ALT one, selectiong symbols)
-<br>SHIFT-RIGHT : select Symbols (then the shift ket acts more like an CTRL one, selectiong control charaters)
+<br>SHIFT-DOWN : select LowerCase (then the shift key acts more like an ALT one, to select symbols)
+<br>SHIFT-UP : select UpperCase (then the shift key acts more like an ALT one, to select symbols)
+<br>SHIFT-RIGHT : select Symbols (then the shift key acts more like an CTRL one, to select control charaters)
 
 RECOMPILING
 -----------
@@ -31,7 +31,7 @@ Follow the excellent recommendations from https://github.com/madcock/PicoMiteAll
 
 NOTES
 --------
-- there are a few GPIO collision, but harmless : Picomputer uses GPIO0 for audio, thus reserving GPIO1 for the orher channel. I still can read the keyboard matrix connected to it.
+- there are a few GPIO collision, but harmless : Picomputer uses GPIO0 for audio, thus reserving GPIO1 for the other channel. I still can read the keyboard matrix connected to it.
 - GPIO4 is supposed to be the screen MISO, but is not connected. Connecting it is useless since it won't make the SCROLL faster. I still can read the keyboard matrix connected to it.
 
 
