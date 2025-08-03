@@ -5020,6 +5020,8 @@ void ResetOptions(bool startup)
     Option.Baudrate = CONSOLE_BAUDRATE;
     Option.PROG_FLASH_SIZE=MAX_PROG_SIZE;
     Option.ColourCode=0x01;
+    Option.RepeatStart=600;
+    Option.RepeatRate=150;
 #ifdef PICOMITEVGA
     Option.DISPLAY_CONSOLE = 1;
     Option.DISPLAY_TYPE = SCREENMODE1;
@@ -5035,8 +5037,6 @@ void ResetOptions(bool startup)
             Option.HDMId2=4;
         #endif
         Option.USBKeyboard = CONFIG_US;
-        Option.RepeatStart=600;
-        Option.RepeatRate=150;
         Option.SerialConsole = 2; 
         Option.SerialTX = 11;
         Option.SerialRX = 12;
