@@ -218,6 +218,7 @@ endif()
 target_link_libraries(PicoMite
 	pico_stdlib
 	hardware_flash
+	pico_unique_id
 	hardware_irq
 	hardware_adc
 	hardware_pwm
