@@ -8984,7 +8984,8 @@ void closeframebuffer(char layer){
             case SCREENMODE1:
             case SCREENMODE2:
 #ifdef rp2350
-                FrameBuf=DisplayBuf;
+                if(ScreenSize<framebuffersize/3)FrameBuf=DisplayBuf;
+                else FreeMemory((void *)FrameBuf);
 #else
                 FreeMemory((void *)FrameBuf);
 #endif
@@ -9010,7 +9011,11 @@ void closeframebuffer(char layer){
                 transparent=0;
             case SCREENMODE1:
 #ifdef rp2350
-                LayerBuf=DisplayBuf;
+                if(ScreenSize<framebuffersize/2)LayerBuf=DisplayBuf;
+                else {
+                    LayerBuf=DisplayBuf;
+                    FreeMemory((void *)temp);
+                }
 #else
                 LayerBuf=DisplayBuf;
                 FreeMemory((void *)temp);
