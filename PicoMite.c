@@ -4296,7 +4296,13 @@ int MIPS16 main(){
 #ifdef PICOMITE
 	mutex_init( &frameBufferMutex );						// create a mutex to lock frame buffer
 #endif
-
+#ifdef GUICONTROLS
+     if(Option.MaxCtrls) {
+        int size=Option.MaxCtrls*sizeof(struct s_ctrl);
+        heap_memory_size-= size;
+        Ctrl=(struct s_ctrl *)AllMemory+heap_memory_size+256;
+     }
+#endif
 
 #ifndef rp2350
     if(Option.CPU_Speed<=200000)modclock(2);
