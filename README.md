@@ -33,6 +33,7 @@ but beware that the list of files to be overridden in the sdk has changed (do NO
 
 NOTES
 --------
+- version 6.01.00b10 : I had to revert a mod in Memory.c, the change of memory area for the GUI Ctrls lead to a link error due to lack of memory for the RP2040
 - version 6.01.00b7 seems to insert an "OPTION LCD BACKLIGHT 0" whick blanks the screen at the first bootup. The command "BACKLIGHT 100,DEFAULT" seems to fix this.
 - there are a few GPIO collision, but harmless : Picomputer uses GPIO0 for audio, thus reserving GPIO1 for the other channel. I still can read the keyboard matrix connected to it.
 - GPIO4 is supposed to be the screen MISO, but is not connected. Connecting it is useless since it won't make the SCROLL faster. I still can read the keyboard matrix connected to it.

@@ -124,8 +124,9 @@ unsigned char *SecondFrame=video;
     unsigned char *FrameBuf=NULL;
 #endif
 #ifdef GUICONTROLS
-    struct s_ctrl CTRLS[MAXCONTROLS];
-    struct s_ctrl *Ctrl=CTRLS;
+    // struct s_ctrl CTRLS[MAXCONTROLS];
+    // struct s_ctrl *Ctrl=CTRLS;
+    struct s_ctrl *Ctrl=NULL;
 #endif
 #ifdef PICOMITEWEB
     unsigned char *WriteBuf=NULL;
