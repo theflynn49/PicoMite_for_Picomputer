@@ -123,9 +123,10 @@ void setwifi(unsigned char *tp)
 {
     getcsargs(&tp, 11);
     if (!(argc == 3 || argc == 5 || argc == 11))
-        error("Syntax");
+        SyntaxError();
+    ;
     if (CurrentLinePtr)
-        error("Invalid in a program");
+        StandardError(10);
     char *ssid = GetTempMemory(STRINGSIZE);
     char *password = GetTempMemory(STRINGSIZE);
     char *hostname = GetTempMemory(STRINGSIZE);
@@ -192,7 +193,7 @@ void VGArecovery(int pin)
     ExtCurrentConfig[PINMAP[PinDef[Option.VGA_HSYNC].GPno + 1]] = EXT_BOOT_RESERVED;
 
     if (pin)
-        error("Pin %/| is in use", pin, pin);
+        StandardErrorParam2(27, pin, pin);
 #ifdef rp2350
     piomap[QVGA_PIO_NUM] |= (uint64_t)((uint64_t)1 << (uint64_t)PinDef[Option.VGA_BLUE].GPno);
     piomap[QVGA_PIO_NUM] |= (uint64_t)((uint64_t)1 << (uint64_t)(PinDef[Option.VGA_BLUE].GPno + 1));
@@ -492,7 +493,7 @@ void cmd_sort(void)
     {
         int card = parseintegerarray(argv[2], &a4int, 2, 1, NULL, true) - 1;
         if (card != size)
-            error("Array size mismatch");
+            StandardError(16);
     }
     if (argc >= 5 && *argv[4])
         flags = getint(argv[4], 0, 7);
@@ -537,7 +538,8 @@ void cmd_timer(void)
     while (*cmdline && tokenfunction(*cmdline) != op_equal)
         cmdline++;
     if (!*cmdline)
-        error("Syntax");
+        SyntaxError();
+    ;
     timeroffset = mytime - (uint64_t)getint(++cmdline, 0, mytime / 1000) * 1000;
 }
 // this is invoked as a function
@@ -629,7 +631,8 @@ void fun_epoch(void)
         arg = getCstring(ep);
         getargs(&arg, 11, (unsigned char *)"-/ :"); // this is a macro and must be the first executable stmt in a block
         if (!(argc == 11))
-            error("Syntax");
+            SyntaxError();
+        ;
         d = atoi((char *)argv[0]);
         m = atoi((char *)argv[2]);
         y = atoi((char *)argv[4]);
@@ -681,7 +684,7 @@ void cmd_pause(void)
     static uint64_t PauseTimer, IntPauseTimer;
     f = getnumber(cmdline) * 1000; // get the pulse width
     if (f < 0)
-        error("Number out of bounds");
+        StandardError(21);
     if (f < 2)
         return;
 
@@ -745,7 +748,7 @@ void cmd_longString(void)
         int j = 0;
         getcsargs(&tp, 5);
         if (argc != 5)
-            error("Argument count");
+            StandardError(2);
         j = (parseintegerarray(argv[0], &dest, 1, 1, NULL, true) - 1) * 8 - 1;
         q = (uint8_t *)&dest[1];
         p = getint(argv[2], g_OptionBase, j - g_OptionBase);
@@ -762,7 +765,7 @@ void cmd_longString(void)
         int i, j, nbr;
         getcsargs(&tp, 3);
         if (argc != 3)
-            error("Argument count");
+            StandardError(2);
         j = parseintegerarray(argv[0], &dest, 1, 1, NULL, true) - 1;
         q = (char *)&dest[1];
         q += dest[0];
@@ -784,7 +787,7 @@ void cmd_longString(void)
         int i;
         getcsargs(&tp, 3);
         if (argc != 3)
-            error("Argument count");
+            StandardError(2);
         parseintegerarray(argv[0], &dest, 1, 1, NULL, true);
         q = (char *)&dest[1];
         trim = getint(argv[2], 1, dest[0]);
@@ -804,7 +807,7 @@ void cmd_longString(void)
         int i, nbr;
         getcsargs(&tp, 5);
         if (argc != 5)
-            error("Argument count");
+            StandardError(2);
         parseintegerarray(argv[0], &dest, 1, 1, NULL, true);
         q = (char *)&dest[1];
         p = (char *)getstring(argv[2]);
@@ -824,7 +827,7 @@ void cmd_longString(void)
         int i, j;
         getcsargs(&tp, 5);
         if (argc != 5)
-            error("Argument count");
+            StandardError(2);
         int64_t nbr = getinteger(argv[2]);
         i = nbr;
         j = parseintegerarray(argv[0], &dest, 1, 1, NULL, true) - 1;
@@ -850,7 +853,7 @@ void cmd_longString(void)
         int i, j, nbr;
         getcsargs(&tp, 5);
         if (argc != 5)
-            error("Argument count");
+            StandardError(2);
         j = parseintegerarray(argv[0], &dest, 1, 1, NULL, true) - 1;
         q = (char *)&dest[1];
         parseintegerarray(argv[2], &src, 2, 1, NULL, false);
@@ -859,7 +862,7 @@ void cmd_longString(void)
         if (nbr > src[0])
             nbr = i = src[0];
         if (j * 8 < i)
-            error("Destination array too small");
+            StandardError(23);
         while (i--)
             *q++ = *p++;
         dest[0] = nbr;
@@ -874,7 +877,7 @@ void cmd_longString(void)
         int i, j, nbr;
         getcsargs(&tp, 5);
         if (argc != 5)
-            error("Argument count");
+            StandardError(2);
         j = parseintegerarray(argv[0], &dest, 1, 1, NULL, true) - 1;
         q = (char *)&dest[1];
         parseintegerarray(argv[2], &src, 2, 1, NULL, false);
@@ -887,7 +890,7 @@ void cmd_longString(void)
         else
             p += (src[0] - nbr);
         if (j * 8 < i)
-            error("Destination array too small");
+            StandardError(23);
         while (i--)
             *q++ = *p++;
         dest[0] = nbr;
@@ -902,7 +905,7 @@ void cmd_longString(void)
         int i, j, nbr, start;
         getcsargs(&tp, 7);
         if (argc < 5)
-            error("Argument count");
+            StandardError(2);
         j = parseintegerarray(argv[0], &dest, 1, 1, NULL, true) - 1;
         q = (char *)&dest[1];
         parseintegerarray(argv[2], &src, 2, 1, NULL, false);
@@ -919,7 +922,7 @@ void cmd_longString(void)
         }
         i = nbr;
         if (j * 8 < nbr)
-            error("Destination array too small");
+            StandardError(23);
         while (i--)
             *q++ = *p++;
         dest[0] = nbr;
@@ -931,7 +934,7 @@ void cmd_longString(void)
         int64_t *dest = NULL;
         getcsargs(&tp, 1);
         if (argc != 1)
-            error("Argument count");
+            StandardError(2);
         parseintegerarray(argv[0], &dest, 1, 1, NULL, true);
         dest[0] = 0;
         return;
@@ -943,7 +946,7 @@ void cmd_longString(void)
         int j = 0;
         getcsargs(&tp, 3);
         if (argc != 3)
-            error("Argument count");
+            StandardError(2);
         j = (parseintegerarray(argv[0], &dest, 1, 1, NULL, true) - 1) * 8;
         dest[0] = getint(argv[2], 0, j);
         return;
@@ -956,7 +959,7 @@ void cmd_longString(void)
         int i;
         getcsargs(&tp, 1);
         if (argc != 1)
-            error("Argument count");
+            StandardError(2);
         parseintegerarray(argv[0], &dest, 1, 1, NULL, true);
         q = (char *)&dest[1];
         i = dest[0];
@@ -977,7 +980,8 @@ void cmd_longString(void)
         bool docrlf = true;
         getargs(&tp, 5, (unsigned char *)",;");
         if (argc == 5)
-            error("Syntax");
+            SyntaxError();
+        ;
         if (argc >= 3)
         {
             if (*argv[0] == '#')
@@ -1013,7 +1017,7 @@ void cmd_longString(void)
         int i;
         getcsargs(&tp, 1);
         if (argc != 1)
-            error("Argument count");
+            StandardError(2);
         parseintegerarray(argv[0], &dest, 1, 1, NULL, true);
         q = (char *)&dest[1];
         i = dest[0];
@@ -1034,14 +1038,14 @@ void cmd_longString(void)
         int i = 0, j;
         getcsargs(&tp, 3);
         if (argc != 3)
-            error("Argument count");
+            StandardError(2);
         j = parseintegerarray(argv[0], &dest, 1, 1, NULL, true);
         q = (char *)&dest[1];
         dest[0] = 0;
         parseintegerarray(argv[2], &src, 2, 1, NULL, false);
         p = (char *)&src[1];
         if (j * 8 < src[0])
-            error("Destination array too small");
+            StandardError(23);
         i = src[0];
         while (i--)
             *q++ = *p++;
@@ -1057,7 +1061,7 @@ void cmd_longString(void)
         int i = 0, j, d = 0, s = 0;
         getcsargs(&tp, 3);
         if (argc != 3)
-            error("Argument count");
+            StandardError(2);
         j = parseintegerarray(argv[0], &dest, 1, 1, NULL, true) - 1;
         q = (char *)&dest[1];
         d = dest[0];
@@ -1065,7 +1069,7 @@ void cmd_longString(void)
         p = (char *)&src[1];
         i = s = src[0];
         if (j * 8 < (d + s))
-            error("Destination array too small");
+            StandardError(23);
         q += d;
         while (i--)
             *q++ = *p++;
@@ -1172,7 +1176,8 @@ void cmd_longString(void)
             return;
         }
         else
-            error("Syntax");
+            SyntaxError();
+        ;
     }
     tp = checkstring(cmdline, (unsigned char *)"BASE64");
     if (tp)
@@ -1186,13 +1191,13 @@ void cmd_longString(void)
             int j;
             getcsargs(&p, 3);
             if (argc != 3)
-                error("Argument count");
+                StandardError(2);
             j = parseintegerarray(argv[2], &dest, 2, 1, NULL, true) - 1;
             q = (unsigned char *)&dest[1];
             parseintegerarray(argv[0], &src, 1, 1, NULL, false);
             qq = (unsigned char *)&src[1];
             if (j * 8 < b64e_size(src[0]))
-                error("Destination array too small");
+                StandardError(23);
             dest[0] = b64_encode(qq, src[0], q);
             return;
         }
@@ -1204,18 +1209,19 @@ void cmd_longString(void)
             int j;
             getcsargs(&p, 3);
             if (argc != 3)
-                error("Argument count");
+                StandardError(2);
             j = parseintegerarray(argv[2], &dest, 2, 1, NULL, true) - 1;
             q = (unsigned char *)&dest[1];
             parseintegerarray(argv[0], &src, 1, 1, NULL, false);
             qq = (unsigned char *)&src[1];
             if (j * 8 < b64d_size(src[0]))
-                error("Destination array too small");
+                StandardError(23);
             dest[0] = b64_decode(qq, src[0], q);
             return;
         }
         else
-            error("Syntax");
+            SyntaxError();
+        ;
     }
     error("Invalid option");
 }
@@ -1229,12 +1235,14 @@ void parselongAES(uint8_t *p, int ivadd, uint8_t *keyx, uint8_t *ivx, int64_t **
     if (ivx == NULL)
     {
         if (argc != 5)
-            error("Syntax");
+            SyntaxError();
+        ;
     }
     else
     {
         if (argc < 5)
-            error("Syntax");
+            SyntaxError();
+        ;
     }
     *outint = NULL;
     // first process the key
@@ -1319,12 +1327,12 @@ void fun_LGetStr(void)
     int start, nbr, j;
     getcsargs(&ep, 5);
     if (argc != 5)
-        error("Argument count");
+        StandardError(2);
     j = (parseintegerarray(argv[0], &src, 2, 1, NULL, false) - 1) * 8;
     start = getint(argv[2], 1, j);
     nbr = getinteger(argv[4]);
     if (nbr < 1 || nbr > MAXSTRLEN)
-        error("Number out of bounds");
+        StandardError(21);
     if (start + nbr > src[0])
         nbr = src[0] - start + 1;
     sret = GetTempMemory(STRINGSIZE); // this will last for the life of the command
@@ -1345,7 +1353,7 @@ void fun_LGetByte(void)
     int start, j;
     getcsargs(&ep, 3);
     if (argc != 3)
-        error("Argument count");
+        StandardError(2);
     j = (parseintegerarray(argv[0], &src, 2, 1, NULL, false) - 1) * 8;
     s = (uint8_t *)&src[1];
     start = getint(argv[2], g_OptionBase, j - g_OptionBase);
@@ -1361,7 +1369,7 @@ void fun_LInstr(void)
     int slen, found = 0, i, j, n;
     getcsargs(&ep, 7);
     if (argc < 3 || argc > 7)
-        error("Argument count");
+        StandardError(2);
     int64_t start;
     if (argc >= 5 && *argv[4])
         start = getinteger(argv[4]) - 1;
@@ -1405,7 +1413,7 @@ void fun_LInstr(void)
         MtoC((unsigned char *)srch);
         temp = findvar(argv[6], V_FIND);
         if (!(g_vartbl[g_VarIndex].type & T_NBR))
-            error("Invalid variable");
+            StandardError(6);
         reti = regcomp(&regex, srch, 0);
         if (reti)
         {
@@ -1443,7 +1451,7 @@ void fun_LCompare(void)
     int d = 0, s = 0, found = 0;
     getcsargs(&ep, 3);
     if (argc != 3)
-        error("Argument count");
+        StandardError(2);
     parseintegerarray(argv[0], &dest, 1, 1, NULL, false);
     q = (char *)&dest[1];
     d = dest[0];
@@ -1490,7 +1498,7 @@ void fun_LLen(void)
     int64_t *dest = NULL;
     getcsargs(&ep, 1);
     if (argc != 1)
-        error("Argument count");
+        StandardError(2);
     parseintegerarray(argv[0], &dest, 1, 1, NULL, false);
     iret = dest[0];
     targ = T_INT;
@@ -1532,13 +1540,15 @@ void cmd_date(void)
     while (*cmdline && tokenfunction(*cmdline) != op_equal)
         cmdline++;
     if (!*cmdline)
-        error("Syntax");
+        SyntaxError();
+    ;
     ++cmdline;
     arg = getCstring(cmdline);
     {
         getargs(&arg, 5, (unsigned char *)"-/"); // this is a macro and must be the first executable stmt in a block
         if (argc != 5)
-            error("Syntax");
+            SyntaxError();
+        ;
         dd = atoi((char *)argv[0]);
         mm = atoi((char *)argv[2]);
         yy = atoi((char *)argv[4]);
@@ -1635,7 +1645,8 @@ void fun_day(void)
         arg = getCstring(ep);
         getargs(&arg, 5, (unsigned char *)"-/"); // this is a macro and must be the first executable stmt in a block
         if (!(argc == 5))
-            error("Syntax");
+            SyntaxError();
+        ;
         d = atoi((char *)argv[0]);
         m = atoi((char *)argv[2]);
         y = atoi((char *)argv[4]);
@@ -1700,7 +1711,8 @@ void cmd_time(void)
     while (*cmdline && tokenfunction(*cmdline) != op_equal)
         cmdline++;
     if (!*cmdline)
-        error("Syntax");
+        SyntaxError();
+    ;
     ++cmdline;
     evaluate(cmdline, &f, &i64, &ss, &t, false);
     int year, month, day, hour, minute, second;
@@ -1711,7 +1723,8 @@ void cmd_time(void)
         {
             getargs(&arg, 5, (unsigned char *)":"); // this is a macro and must be the first executable stmt in a block
             if (argc % 2 == 0)
-                error("Syntax");
+                SyntaxError();
+            ;
             h = atoi((char *)argv[0]);
             if (argc >= 3)
                 m = atoi((char *)argv[2]);
@@ -1815,7 +1828,7 @@ void MIPS16 cmd_library(void)
         int i, j, k, InCFun, InQuote, CmdExpected;
         unsigned int CFunDefAddr[100], *CFunHexAddr[100];
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         if (*ProgMemory != 0x01)
             return;
         checkend(p);
@@ -2080,7 +2093,7 @@ void MIPS16 cmd_library(void)
     {
         int i;
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         if (Option.LIBRARY_FLASH_SIZE != MAX_PROG_SIZE)
             return;
 
@@ -2111,7 +2124,7 @@ void MIPS16 cmd_library(void)
     if (checkstring(cmdline, (unsigned char *)"LIST ALL"))
     {
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         if (Option.LIBRARY_FLASH_SIZE != MAX_PROG_SIZE)
             return;
         ListProgram(ProgMemory - Option.LIBRARY_FLASH_SIZE, true);
@@ -2120,7 +2133,7 @@ void MIPS16 cmd_library(void)
     if (checkstring(cmdline, (unsigned char *)"LIST"))
     {
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         if (Option.LIBRARY_FLASH_SIZE != MAX_PROG_SIZE)
             return;
         ListProgram(ProgMemory - Option.LIBRARY_FLASH_SIZE, false);
@@ -2130,9 +2143,10 @@ void MIPS16 cmd_library(void)
     {
         getcsargs(&tp, 1);
         if (!(argc == 1))
-            error("Syntax");
+            SyntaxError();
+        ;
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         int fnbr = FindFreeFileNbr();
         if (!InitSDCard())
             return;
@@ -2191,9 +2205,10 @@ void MIPS16 cmd_library(void)
         int fsize;
         getcsargs(&tp, 1);
         if (!(argc == 1))
-            error("Syntax");
+            SyntaxError();
+        ;
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         int fnbr = FindFreeFileNbr();
         if (!InitSDCard())
             return;
@@ -2229,7 +2244,7 @@ void MIPS16 cmd_library(void)
         return;
     }
 
-    error("Invalid syntax");
+    SyntaxError();
 }
 
 // set up the tick interrupt
@@ -2243,7 +2258,7 @@ void cmd_settick(void)
     getcsargs(&cmdline, 5);
     strcpy(s, (char *)argv[0]);
     if (!(argc == 3 || argc == 5))
-        error("Argument count");
+        StandardError(2);
     if (argc == 5)
         irq = getint(argv[4], 1, NBRSETTICKS) - 1;
     if (strcasecmp((char *)argv[0], "PAUSE") == 0)
@@ -3241,7 +3256,7 @@ void MIPS16 ConfigDisplayUser(unsigned char *tp)
         if (Option.DISPLAY_TYPE)
             error("Display already configured");
         if (argc != 5)
-            error("Argument count");
+            StandardError(2);
         HRes = DisplayHRes = getint(argv[2], 1, 10000);
         VRes = DisplayVRes = getint(argv[4], 1, 10000);
         Option.DISPLAY_TYPE = DISP_USER;
@@ -4176,7 +4191,8 @@ void MIPS16 cmd_option(void)
                 return;
             }
             else
-                error("Syntax");
+                SyntaxError();
+            ;
         }
 #if PICOMITERP2350
         else if (Option.DISPLAY_TYPE >= SSD1963_5_12BUFF)
@@ -4214,7 +4230,8 @@ void MIPS16 cmd_option(void)
         else if (checkstring(tp, (unsigned char *)"NONE"))
             OptionConsole = 0;
         else
-            error("Syntax");
+            SyntaxError();
+        ;
         return;
     }
     tp = checkstring(cmdline, (unsigned char *)"DEFAULT");
@@ -4269,7 +4286,7 @@ void MIPS16 cmd_option(void)
         char p[STRINGSIZE];
         strcpy(p, (char *)getCstring(tp));
         if (strlen(p) >= sizeof(Option.F1key))
-            error("Maximum 63 characters");
+            StandardErrorParam(33, MAXKEYLEN - 1);
         else
             strcpy((char *)Option.F1key, p);
         SaveOptions();
@@ -4281,7 +4298,7 @@ void MIPS16 cmd_option(void)
         char p[STRINGSIZE];
         strcpy(p, (char *)getCstring(tp));
         if (strlen(p) >= sizeof(Option.F5key))
-            error("Maximum % characters", MAXKEYLEN - 1);
+            StandardErrorParam(33, MAXKEYLEN - 1);
         else
             strcpy((char *)Option.F5key, p);
         SaveOptions();
@@ -4293,7 +4310,7 @@ void MIPS16 cmd_option(void)
         char p[STRINGSIZE];
         strcpy(p, (char *)getCstring(tp));
         if (strlen(p) >= sizeof(Option.F6key))
-            error("Maximum % characters", MAXKEYLEN - 1);
+            StandardErrorParam(33, MAXKEYLEN - 1);
         else
             strcpy((char *)Option.F6key, p);
         SaveOptions();
@@ -4305,7 +4322,7 @@ void MIPS16 cmd_option(void)
         char p[STRINGSIZE];
         strcpy(p, (char *)getCstring(tp));
         if (strlen(p) >= sizeof(Option.F7key))
-            error("Maximum % characters", MAXKEYLEN - 1);
+            StandardErrorParam(33, MAXKEYLEN - 1);
         else
             strcpy((char *)Option.F7key, p);
         SaveOptions();
@@ -4317,7 +4334,7 @@ void MIPS16 cmd_option(void)
         char p[STRINGSIZE];
         strcpy(p, (char *)getCstring(tp));
         if (strlen(p) >= sizeof(Option.F8key))
-            error("Maximum % characters", MAXKEYLEN - 1);
+            StandardErrorParam(33, MAXKEYLEN - 1);
         else
             strcpy((char *)Option.F8key, p);
         SaveOptions();
@@ -4329,7 +4346,7 @@ void MIPS16 cmd_option(void)
         char p[STRINGSIZE];
         strcpy(p, (char *)getCstring(tp));
         if (strlen(p) >= sizeof(Option.F9key))
-            error("Maximum % characters", MAXKEYLEN - 1);
+            StandardErrorParam(33, MAXKEYLEN - 1);
         else
             strcpy((char *)Option.F9key, p);
         SaveOptions();
@@ -4341,7 +4358,7 @@ void MIPS16 cmd_option(void)
         char p[STRINGSIZE];
         strcpy(p, (char *)getCstring(tp));
         if (strlen(p) >= sizeof(Option.platform))
-            error("Maximum % characters", sizeof(Option.platform) - 1);
+            StandardErrorParam(33, sizeof(Option.platform) - 1);
         else
         {
             if (checkstring((unsigned char *)p, (unsigned char *)"GAMEMITE"))
@@ -4359,9 +4376,10 @@ void MIPS16 cmd_option(void)
     {
         getcsargs(&tp, 7);
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         if (argc != 7)
-            error("Syntax");
+            SyntaxError();
+        ;
         uint8_t clock = getint(argv[0], 0, 7);
         uint8_t d0 = getint(argv[2], 0, 7);
         uint8_t d1 = getint(argv[4], 0, 7);
@@ -4417,14 +4435,14 @@ void MIPS16 cmd_option(void)
         unsigned char code;
         getcsargs(&tp, 1);
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         if (!(code = codecheck(argv[0])))
             argv[0] += 2;
         pin1 = getinteger(argv[0]);
         if (!code)
             pin1 = codemap(pin1);
         if (IsInvalidPin(pin1))
-            error("Invalid pin");
+            StandardError(9);
         if (ExtCurrentConfig[pin1] != EXT_NOT_CONFIG)
             error("Pin | is in use", pin1);
         if (!(pin1 == 1 || pin1 == 11 || pin1 == 25 || pin1 == 62))
@@ -4454,7 +4472,8 @@ void MIPS16 cmd_option(void)
     {
         getcsargs(&tp, 3);
         if (!Option.LOCAL_KEYBOARD)
-            error("Syntax");
+            SyntaxError();
+        ;
         Option.RepeatStart = getint(argv[0], 100, 2000);
         Option.RepeatRate = getint(argv[2], 25, 2000);
         SaveOptions();
@@ -4470,29 +4489,30 @@ void MIPS16 cmd_option(void)
         unsigned char code;
         getcsargs(&tp, 3);
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         if (Option.KEYBOARD_CLOCK)
             error("Keyboard must be disabled to change pins");
         if (argc != 3)
-            error("Syntax");
+            SyntaxError();
+        ;
         if (!(code = codecheck(argv[0])))
             argv[0] += 2;
         pin1 = getinteger(argv[0]);
         if (!code)
             pin1 = codemap(pin1);
         if (IsInvalidPin(pin1))
-            error("Invalid pin");
+            StandardError(9);
         if (ExtCurrentConfig[pin1] != EXT_NOT_CONFIG)
-            error("Pin %/| is in use", pin1, pin1);
+            StandardErrorParam2(27, pin1, pin1);
         if (!(code = codecheck(argv[2])))
             argv[2] += 2;
         pin2 = getinteger(argv[2]);
         if (!code)
             pin2 = codemap(pin2);
         if (IsInvalidPin(pin2))
-            error("Invalid pin");
+            StandardError(9);
         if (ExtCurrentConfig[pin2] != EXT_NOT_CONFIG)
-            error("Pin %/| is in use", pin2, pin2);
+            StandardErrorParam2(27, pin2, pin2);
         Option.KEYBOARD_CLOCK = pin1;
         Option.KEYBOARD_DATA = pin2;
         SaveOptions();
@@ -4504,7 +4524,7 @@ void MIPS16 cmd_option(void)
     if (tp)
     {
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         if (checkstring(tp, (unsigned char *)"DISABLE"))
         {
             Option.MOUSE_CLOCK = 0;
@@ -4518,25 +4538,26 @@ void MIPS16 cmd_option(void)
             if (Option.MOUSE_CLOCK)
                 error("Mouse must be disabled to change pins");
             if (argc != 3)
-                error("Syntax");
+                SyntaxError();
+            ;
             if (!(code = codecheck(argv[0])))
                 argv[0] += 2;
             pin1 = getinteger(argv[0]);
             if (!code)
                 pin1 = codemap(pin1);
             if (IsInvalidPin(pin1))
-                error("Invalid pin");
+                StandardError(9);
             if (ExtCurrentConfig[pin1] != EXT_NOT_CONFIG)
-                error("Pin %/| is in use", pin1, pin1);
+                StandardErrorParam2(27, pin1, pin1);
             if (!(code = codecheck(argv[2])))
                 argv[2] += 2;
             pin2 = getinteger(argv[2]);
             if (!code)
                 pin2 = codemap(pin2);
             if (IsInvalidPin(pin2))
-                error("Invalid pin");
+                StandardError(9);
             if (ExtCurrentConfig[pin2] != EXT_NOT_CONFIG)
-                error("Pin %/| is in use", pin2, pin2);
+                StandardErrorParam2(27, pin2, pin2);
             Option.MOUSE_CLOCK = pin1;
             Option.MOUSE_DATA = pin2;
         }
@@ -4551,7 +4572,7 @@ void MIPS16 cmd_option(void)
     if (tp)
     {
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
 #ifndef USBKEYBOARD
         if (checkstring(tp, (unsigned char *)"DISABLE"))
         {
@@ -4575,9 +4596,9 @@ void MIPS16 cmd_option(void)
                 Option.KEYBOARD_DATA = KEYBOARDDATA;
             }
             if (ExtCurrentConfig[Option.KEYBOARD_CLOCK] != EXT_NOT_CONFIG && Option.KeyboardConfig == NO_KEYBOARD)
-                error("Pin %/| is in use", Option.KEYBOARD_CLOCK, Option.KEYBOARD_CLOCK);
+                StandardErrorParam2(27, Option.KEYBOARD_CLOCK, Option.KEYBOARD_CLOCK);
             if (ExtCurrentConfig[Option.KEYBOARD_DATA] != EXT_NOT_CONFIG && Option.KeyboardConfig == NO_KEYBOARD)
-                error("Pin %/| is in use", Option.KEYBOARD_DATA, Option.KEYBOARD_DATA);
+                StandardErrorParam2(27, Option.KEYBOARD_DATA, Option.KEYBOARD_DATA);
 
             if (checkstring(argv[0], (unsigned char *)"US"))
                 Option.KeyboardConfig = CONFIG_US;
@@ -4612,7 +4633,8 @@ void MIPS16 cmd_option(void)
             Option.USBKeyboard = CONFIG_ES;
 #endif
             else
-                error("Syntax");
+                SyntaxError();
+            ;
             Option.capslock = 0;
             Option.numlock = 1;
 #ifndef USBKEYBOARD
@@ -4657,11 +4679,11 @@ void MIPS16 cmd_option(void)
     if (tp)
     {
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         int i;
         i = getint(tp, Option.CPU_Speed * 1000 / 16 / 65535, 921600);
         if (i < 100)
-            error("Number out of bounds");
+            StandardError(21);
         Option.Baudrate = i;
         SaveOptions();
         if (!Option.SerialConsole)
@@ -4675,7 +4697,7 @@ void MIPS16 cmd_option(void)
     if (tp)
     {
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         //        unsigned char *p=NULL;
         if (checkstring(tp, (unsigned char *)"DISABLE"))
         {
@@ -4692,7 +4714,8 @@ void MIPS16 cmd_option(void)
             int pin, pin2;
             getcsargs(&tp, 5);
             if (!(argc == 3 || argc == 5))
-                error("Syntax");
+                SyntaxError();
+            ;
             char code;
             if (!(code = codecheck(argv[0])))
                 argv[0] += 2;
@@ -4705,9 +4728,9 @@ void MIPS16 cmd_option(void)
             if (!code)
                 pin2 = codemap(pin2);
             if (ExtCurrentConfig[pin] != EXT_NOT_CONFIG)
-                error("Pin %/| is in use", pin, pin);
+                StandardErrorParam2(27, pin, pin);
             if (ExtCurrentConfig[pin2] != EXT_NOT_CONFIG)
-                error("Pin %/| is in use", pin2, pin2);
+                StandardErrorParam2(27, pin2, pin2);
             if (PinDef[pin].mode & UART0TX)
                 Option.SerialTX = pin;
             else if (PinDef[pin].mode & UART0RX)
@@ -4719,9 +4742,9 @@ void MIPS16 cmd_option(void)
             else if (PinDef[pin2].mode & UART0RX)
                 Option.SerialRX = pin2;
             else
-                error("Invalid configuration");
+                StandardError(8);
             if (Option.SerialTX == Option.SerialRX)
-                error("Invalid configuration");
+                StandardError(8);
             Option.SerialConsole = 1;
             if (argc == 5)
                 Option.SerialConsole = (checkstring(argv[4], (unsigned char *)"B") ? 5 : 1);
@@ -4735,15 +4758,15 @@ void MIPS16 cmd_option(void)
             else if (PinDef[pin].mode & UART1RX)
                 Option.SerialRX = pin;
             else
-                error("Invalid configuration");
+                StandardError(8);
             if (PinDef[pin2].mode & UART1TX)
                 Option.SerialTX = pin2;
             else if (PinDef[pin2].mode & UART1RX)
                 Option.SerialRX = pin2;
             else
-                error("Invalid configuration");
+                StandardError(8);
             if (Option.SerialTX == Option.SerialRX)
-                error("Invalid configuration");
+                StandardError(8);
             Option.SerialConsole = 2;
             if (argc == 5)
                 Option.SerialConsole = (checkstring(argv[4], (unsigned char *)"B") ? 6 : 2);
@@ -4763,7 +4786,8 @@ void MIPS16 cmd_option(void)
             if (checkstring(argv[2], (unsigned char *)"NORESET"))
                 Option.NoReset = 1;
             else
-                error("Syntax");
+                SyntaxError();
+            ;
         }
         if (checkstring(argv[0], (unsigned char *)"OFF"))
         {
@@ -4794,7 +4818,8 @@ void MIPS16 cmd_option(void)
         else if (checkstring(tp, (unsigned char *)"ON") || checkstring(tp, (unsigned char *)"ENABLE"))
             Option.AllPins = 0;
         else
-            error("Syntax");
+            SyntaxError();
+        ;
         SaveOptions();
         if (Option.AllPins == 0)
         {
@@ -4981,7 +5006,8 @@ void MIPS16 cmd_option(void)
             if (checkstring(tp, (unsigned char *)"ON") || checkstring(tp, (unsigned char *)"ENABLE"))
                 Option.NoHeartbeat = 0;
             else
-                error("Syntax");
+                SyntaxError();
+            ;
             SaveOptions();
             return;
         }
@@ -5002,9 +5028,9 @@ void MIPS16 cmd_option(void)
                     if (!code)
                         pin1 = codemap(pin1);
                     if (IsInvalidPin(pin1))
-                        error("Invalid pin");
+                        StandardError(9);
                     if (ExtCurrentConfig[pin1] != EXT_NOT_CONFIG)
-                        error("Pin %/| is in use", pin1, pin1);
+                        StandardErrorParam2(27, pin1, pin1);
                     Option.NoHeartbeat = 0;
                     Option.heartbeatpin = pin1;
                     SaveOptions();
@@ -5015,7 +5041,8 @@ void MIPS16 cmd_option(void)
                     Option.NoHeartbeat = 0;
             }
             else
-                error("Syntax");
+                SyntaxError();
+            ;
         }
         SaveOptions();
         if (CheckPin(HEARTBEATpin, CP_NOABORT | CP_IGNORE_INUSE | CP_IGNORE_RESERVED))
@@ -5038,7 +5065,7 @@ void MIPS16 cmd_option(void)
     if (tp)
     {
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         Option.Height = SCREENHEIGHT;
         Option.Width = SCREENWIDTH;
         Option.DISPLAY_CONSOLE = 0;
@@ -5058,7 +5085,7 @@ void MIPS16 cmd_option(void)
     if (tp)
     {
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         Option.NoScroll = 0;
         if (!(Option.DISPLAY_TYPE == ST7789B || Option.DISPLAY_TYPE == ILI9488 || Option.DISPLAY_TYPE == ST7796SP || Option.DISPLAY_TYPE == ST7796S || Option.DISPLAY_TYPE == ILI9488P || Option.DISPLAY_TYPE == ILI9341 || Option.DISPLAY_TYPE >= VGADISPLAY))
             Option.NoScroll = 1;
@@ -5103,7 +5130,8 @@ void MIPS16 cmd_option(void)
                         error("Invalid for this display");
                 }
                 else
-                    error("Syntax");
+                    SyntaxError();
+                ;
             }
         }
         if (Option.DISPLAY_BL)
@@ -5187,7 +5215,8 @@ void MIPS16 cmd_option(void)
             CMM1 = 1;
             return;
         }
-        error("Syntax");
+        SyntaxError();
+        ;
     }
 #ifdef PICOMITEWEB
     tp = checkstring(cmdline, (unsigned char *)"WEB MESSAGES");
@@ -5217,7 +5246,7 @@ void MIPS16 cmd_option(void)
     {
         getcsargs(&tp, 3);
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         Option.TCP_PORT = getint(argv[0], 0, 65535);
         Option.ServerResponceTime = 5000;
         if (argc == 3)
@@ -5232,7 +5261,7 @@ void MIPS16 cmd_option(void)
     {
         getcsargs(&tp, 3);
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         Option.UDP_PORT = getint(argv[0], 0, 65535);
         Option.UDPServerResponceTime = 5000;
         if (argc == 3)
@@ -5246,7 +5275,7 @@ void MIPS16 cmd_option(void)
     if (tp)
     {
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         if (checkstring(tp, (unsigned char *)"OFF"))
             Option.Telnet = 0;
         else if (checkstring(tp, (unsigned char *)"ON"))
@@ -5254,7 +5283,8 @@ void MIPS16 cmd_option(void)
         else if (checkstring(tp, (unsigned char *)"ONLY"))
             Option.Telnet = -1;
         else
-            error("Syntax");
+            SyntaxError();
+        ;
         SaveOptions();
         _excep_code = RESET_COMMAND;
         SoftReset();
@@ -5264,7 +5294,7 @@ void MIPS16 cmd_option(void)
     if (tp)
     {
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         if (checkstring(tp, (unsigned char *)"OFF"))
             Option.disabletftp = 1;
         else if (checkstring(tp, (unsigned char *)"ON"))
@@ -5274,7 +5304,8 @@ void MIPS16 cmd_option(void)
         else if (checkstring(tp, (unsigned char *)"DISABLE"))
             Option.disabletftp = 1;
         else
-            error("Syntax");
+            SyntaxError();
+        ;
         SaveOptions();
         _excep_code = RESET_COMMAND;
         SoftReset();
@@ -5289,7 +5320,7 @@ void MIPS16 cmd_option(void)
     {
         getcsargs(&tp, 3);
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         if ((checkstring(argv[0], (unsigned char *)"640")) || (checkstring(argv[0], (unsigned char *)"640x480")))
         {
             if (argc == 3)
@@ -5358,7 +5389,8 @@ void MIPS16 cmd_option(void)
             Option.DefaultFont = 1;
         }
         else
-            error("Syntax");
+            SyntaxError();
+        ;
 #ifndef HDMI
         Option.X_TILE = (Option.CPU_Speed == Freq848 ? 106 : Option.CPU_Speed == Freq400 ? 90
                                                          : Option.CPU_Speed == FreqSVGA  ? 100
@@ -5378,7 +5410,7 @@ void MIPS16 cmd_option(void)
         int pin1, pin2, testpin;
         getcsargs(&tp, 3);
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         char code;
         if (!(code = codecheck(argv[0])))
             argv[0] += 2;
@@ -5503,7 +5535,7 @@ void MIPS16 cmd_option(void)
     {
         uint32_t speed = 0;
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         speed = getint(tp, MIN_CPU, MAX_CPU);
         uint vco, postdiv1, postdiv2;
         if (!check_sys_clock_khz(speed, &vco, &postdiv1, &postdiv2))
@@ -5531,7 +5563,8 @@ void MIPS16 cmd_option(void)
             Option.Refresh = 0;
             return;
         }
-        error("Syntax");
+        SyntaxError();
+        ;
     }
 
     tp = checkstring(cmdline, (unsigned char *)"LCDPANEL");
@@ -5540,7 +5573,7 @@ void MIPS16 cmd_option(void)
         if (checkstring(tp, (unsigned char *)"DISABLE"))
         {
             if (CurrentLinePtr)
-                error("Invalid in a program");
+                StandardError(10);
             Option.LCD_CD = Option.LCD_CS = Option.LCD_Reset = Option.DISPLAY_TYPE = Option.SSD_DATA = HRes = VRes = 0;
             Option.SSD_DC = Option.SSD_WR = Option.SSD_RD = SSD1963data = 0;
             Option.TOUCH_XZERO = Option.TOUCH_YZERO = 0; // record the touch feature as not calibrated
@@ -5566,7 +5599,7 @@ void MIPS16 cmd_option(void)
             if (Option.DISPLAY_TYPE)
                 return;
             if (CurrentLinePtr)
-                error("Invalid in a program");
+                StandardError(10);
             if (!Option.DISPLAY_TYPE)
                 ConfigDisplaySPI(tp);
             if (!Option.DISPLAY_TYPE)
@@ -5585,7 +5618,7 @@ void MIPS16 cmd_option(void)
     if (tp)
     {
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         if (checkstring(tp, (unsigned char *)"DISABLE"))
         {
             if (Option.CombinedCS)
@@ -5632,7 +5665,7 @@ void MIPS16 cmd_option(void)
     {
         getcsargs(&tp, 1);
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         Option.MaxCtrls = getint(argv[0], 0, MAXCONTROLS - 1);
         if (Option.MaxCtrls)
             Option.MaxCtrls++;
@@ -5762,7 +5795,8 @@ void MIPS16 cmd_option(void)
             return;
         }
         else
-            error("Syntax");
+            SyntaxError();
+        ;
     }
 
     tp = checkstring(cmdline, (unsigned char *)"RTC AUTO");
@@ -5810,7 +5844,8 @@ void MIPS16 cmd_option(void)
             return;
         }
         else
-            error("Syntax");
+            SyntaxError();
+        ;
     }
 
     tp = checkstring(cmdline, (unsigned char *)"MODBUFF");
@@ -5819,7 +5854,7 @@ void MIPS16 cmd_option(void)
         unsigned char *p = NULL;
         int i, size = 0;
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         if ((p = checkstring(tp, (unsigned char *)"ENABLE")))
         {
             if (!Option.modbuff)
@@ -5894,7 +5929,7 @@ void MIPS16 cmd_option(void)
         int pin1, pin2, slice;
         unsigned char *p;
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         if (checkstring(tp, (unsigned char *)"DISABLE"))
         {
             disable_audio();
@@ -5908,7 +5943,8 @@ void MIPS16 cmd_option(void)
             int pin1, pin2, pin3, pin4, pin5, pin6, pin7;
             getcsargs(&p, 13);
             if (argc != 13)
-                error("Syntax");
+                SyntaxError();
+            ;
             if (Option.AUDIO_CLK_PIN || Option.AUDIO_L)
                 error("Audio already configured");
             unsigned char code;
@@ -5919,9 +5955,9 @@ void MIPS16 cmd_option(void)
             if (!code)
                 pin1 = codemap(pin1);
             if (IsInvalidPin(pin1))
-                error("Invalid pin");
+                StandardError(9);
             if (ExtCurrentConfig[pin1] != EXT_NOT_CONFIG)
-                error("Pin %/| is in use", pin1, pin1);
+                StandardErrorParam2(27, pin1, pin1);
             //
             if (!(code = codecheck(argv[2])))
                 argv[2] += 2;
@@ -5929,9 +5965,9 @@ void MIPS16 cmd_option(void)
             if (!code)
                 pin2 = codemap(pin2);
             if (IsInvalidPin(pin2))
-                error("Invalid pin");
+                StandardError(9);
             if (ExtCurrentConfig[pin2] != EXT_NOT_CONFIG)
-                error("Pin %/| is in use", pin2, pin2);
+                StandardErrorParam2(27, pin2, pin2);
             //
             if (!(code = codecheck(argv[4])))
                 argv[4] += 2;
@@ -5939,9 +5975,9 @@ void MIPS16 cmd_option(void)
             if (!code)
                 pin3 = codemap(pin3);
             if (IsInvalidPin(pin3))
-                error("Invalid pin");
+                StandardError(9);
             if (ExtCurrentConfig[pin3] != EXT_NOT_CONFIG)
-                error("Pin %/| is in use", pin3, pin3);
+                StandardErrorParam2(27, pin3, pin3);
             //
             if (!(code = codecheck(argv[6])))
                 argv[6] += 2;
@@ -5949,9 +5985,9 @@ void MIPS16 cmd_option(void)
             if (!code)
                 pin4 = codemap(pin4);
             if (IsInvalidPin(pin4))
-                error("Invalid pin");
+                StandardError(9);
             if (ExtCurrentConfig[pin4] != EXT_NOT_CONFIG)
-                error("Pin %/| is in use", pin4, pin4);
+                StandardErrorParam2(27, pin4, pin4);
             //
             if (!(code = codecheck(argv[8])))
                 argv[8] += 2;
@@ -5959,9 +5995,9 @@ void MIPS16 cmd_option(void)
             if (!code)
                 pin5 = codemap(pin5);
             if (IsInvalidPin(pin5))
-                error("Invalid pin");
+                StandardError(9);
             if (ExtCurrentConfig[pin5] != EXT_NOT_CONFIG)
-                error("Pin %/| is in use", pin5, pin5);
+                StandardErrorParam2(27, pin5, pin5);
             //
             if (!(code = codecheck(argv[10])))
                 argv[10] += 2;
@@ -5969,9 +6005,9 @@ void MIPS16 cmd_option(void)
             if (!code)
                 pin6 = codemap(pin6);
             if (IsInvalidPin(pin6))
-                error("Invalid pin");
+                StandardError(9);
             if (ExtCurrentConfig[pin6] != EXT_NOT_CONFIG)
-                error("Pin %/| is in use", pin6, pin6);
+                StandardErrorParam2(27, pin6, pin6);
             //
             if (!(code = codecheck(argv[12])))
                 argv[12] += 2;
@@ -5979,9 +6015,9 @@ void MIPS16 cmd_option(void)
             if (!code)
                 pin7 = codemap(pin7);
             if (IsInvalidPin(pin7))
-                error("Invalid pin");
+                StandardError(9);
             if (ExtCurrentConfig[pin7] != EXT_NOT_CONFIG)
-                error("Pin %/| is in use", pin7, pin7);
+                StandardErrorParam2(27, pin7, pin7);
             //
             if (!(PinDef[pin1].mode & SPI0SCK && PinDef[pin2].mode & SPI0TX && PinDef[pin3].mode & SPI0RX) &&
                 !(PinDef[pin1].mode & SPI1SCK && PinDef[pin2].mode & SPI1TX && PinDef[pin3].mode & SPI1RX))
@@ -6011,7 +6047,8 @@ void MIPS16 cmd_option(void)
             int pin1, pin2, pin3;
             getcsargs(&p, 5);
             if (argc != 5)
-                error("Syntax");
+                SyntaxError();
+            ;
             if (Option.AUDIO_CLK_PIN || Option.AUDIO_L)
                 error("Audio already configured");
             unsigned char code;
@@ -6022,9 +6059,9 @@ void MIPS16 cmd_option(void)
             if (!code)
                 pin1 = codemap(pin1);
             if (IsInvalidPin(pin1))
-                error("Invalid pin");
+                StandardError(9);
             if (ExtCurrentConfig[pin1] != EXT_NOT_CONFIG)
-                error("Pin %/| is in use", pin1, pin1);
+                StandardErrorParam2(27, pin1, pin1);
             //
             if (!(code = codecheck(argv[2])))
                 argv[2] += 2;
@@ -6032,9 +6069,9 @@ void MIPS16 cmd_option(void)
             if (!code)
                 pin2 = codemap(pin2);
             if (IsInvalidPin(pin2))
-                error("Invalid pin");
+                StandardError(9);
             if (ExtCurrentConfig[pin2] != EXT_NOT_CONFIG)
-                error("Pin %/| is in use", pin2, pin2);
+                StandardErrorParam2(27, pin2, pin2);
             //
             if (!(code = codecheck(argv[4])))
                 argv[4] += 2;
@@ -6042,9 +6079,9 @@ void MIPS16 cmd_option(void)
             if (!code)
                 pin3 = codemap(pin3);
             if (IsInvalidPin(pin3))
-                error("Invalid pin");
+                StandardError(9);
             if (ExtCurrentConfig[pin3] != EXT_NOT_CONFIG)
-                error("Pin %/| is in use", pin3, pin3);
+                StandardErrorParam2(27, pin3, pin3);
             //
             if (!(PinDef[pin2].mode & SPI0SCK && PinDef[pin3].mode & SPI0TX) &&
                 !(PinDef[pin2].mode & SPI1SCK && PinDef[pin3].mode & SPI1TX))
@@ -6071,7 +6108,8 @@ void MIPS16 cmd_option(void)
             int pin1, pin2, pin3;
             getcsargs(&p, 3);
             if (argc != 3)
-                error("Syntax");
+                SyntaxError();
+            ;
             if (Option.AUDIO_CLK_PIN || Option.AUDIO_L || Option.audio_i2s_bclk)
                 error("Audio already configured");
             unsigned char code;
@@ -6082,15 +6120,15 @@ void MIPS16 cmd_option(void)
             if (!code)
                 pin1 = codemap(pin1);
             if (IsInvalidPin(pin1))
-                error("Invalid pin");
+                StandardError(9);
             if (ExtCurrentConfig[pin1] != EXT_NOT_CONFIG)
-                error("Pin %/| is in use", pin1, pin1);
+                StandardErrorParam2(27, pin1, pin1);
             //
             pin3 = PINMAP[PinDef[pin1].GPno + 1];
             if (IsInvalidPin(pin3))
-                error("Invalid pin");
+                StandardError(9);
             if (ExtCurrentConfig[pin3] != EXT_NOT_CONFIG)
-                error("Pin %/| is in use", pin3, pin3);
+                StandardErrorParam2(27, pin3, pin3);
             //
             if (!(code = codecheck(argv[2])))
                 argv[2] += 2;
@@ -6098,9 +6136,9 @@ void MIPS16 cmd_option(void)
             if (!code)
                 pin2 = codemap(pin2);
             if (IsInvalidPin(pin2))
-                error("Invalid pin");
+                StandardError(9);
             if (ExtCurrentConfig[pin2] != EXT_NOT_CONFIG || pin2 == pin1 || pin2 == pin3)
-                error("Pin %/| is in use", pin2, pin2);
+                StandardErrorParam2(27, pin2, pin2);
 
 //
 #ifdef rp2350
@@ -6132,7 +6170,8 @@ void MIPS16 cmd_option(void)
         }
         getcsargs(&tp, 3);
         if (argc != 3)
-            error("Syntax");
+            SyntaxError();
+        ;
         if (Option.AUDIO_CLK_PIN || Option.AUDIO_L)
             error("Audio already configured");
         unsigned char code;
@@ -6142,18 +6181,18 @@ void MIPS16 cmd_option(void)
         if (!code)
             pin1 = codemap(pin1);
         if (IsInvalidPin(pin1))
-            error("Invalid pin");
+            StandardError(9);
         if (ExtCurrentConfig[pin1] != EXT_NOT_CONFIG)
-            error("Pin %/| is in use", pin1, pin1);
+            StandardErrorParam2(27, pin1, pin1);
         if (!(code = codecheck(argv[2])))
             argv[2] += 2;
         pin2 = getinteger(argv[2]);
         if (!code)
             pin2 = codemap(pin2);
         if (IsInvalidPin(pin2))
-            error("Invalid pin");
+            StandardError(9);
         if (ExtCurrentConfig[pin2] != EXT_NOT_CONFIG)
-            error("Pin %/| is in use", pin2, pin2);
+            StandardErrorParam2(27, pin2, pin2);
         slice = checkslice(pin1, pin2, 0);
         if ((PinDef[Option.DISPLAY_BL].slice & 0x7f) == slice)
             error("Channel in use for backlight");
@@ -6173,7 +6212,7 @@ void MIPS16 cmd_option(void)
         if (checkstring(tp, (unsigned char *)"DISABLE"))
         {
             if (CurrentLinePtr)
-                error("Invalid in a program");
+                StandardError(10);
 #ifdef PICOMITEVGA
             if (Option.RTC_Clock || Option.RTC_Data)
                 error("In use");
@@ -6189,9 +6228,10 @@ void MIPS16 cmd_option(void)
         }
         getcsargs(&tp, 5);
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         if (argc < 3)
-            error("Syntax");
+            SyntaxError();
+        ;
         if (Option.SYSTEM_I2C_SCL)
             error("I2C already configured");
         unsigned char code;
@@ -6201,18 +6241,18 @@ void MIPS16 cmd_option(void)
         if (!code)
             pin1 = codemap(pin1);
         if (IsInvalidPin(pin1))
-            error("Invalid pin");
+            StandardError(9);
         if (ExtCurrentConfig[pin1] != EXT_NOT_CONFIG)
-            error("Pin %/| is in use", pin1, pin1);
+            StandardErrorParam2(27, pin1, pin1);
         if (!(code = codecheck(argv[2])))
             argv[2] += 2;
         pin2 = getinteger(argv[2]);
         if (!code)
             pin2 = codemap(pin2);
         if (IsInvalidPin(pin2))
-            error("Invalid pin");
+            StandardError(9);
         if (ExtCurrentConfig[pin2] != EXT_NOT_CONFIG)
-            error("Pin %/| is in use", pin2, pin2);
+            StandardErrorParam2(27, pin2, pin2);
         if (PinDef[pin1].mode & I2C0SDA && PinDef[pin2].mode & I2C0SCL)
             channel = 0;
         if (PinDef[pin1].mode & I2C1SDA && PinDef[pin2].mode & I2C1SCL)
@@ -6227,7 +6267,8 @@ void MIPS16 cmd_option(void)
             else if (checkstring(argv[4], (unsigned char *)"FAST"))
                 Option.SYSTEM_I2C_SLOW = 0;
             else
-                error("Syntax");
+                SyntaxError();
+            ;
         }
         Option.SYSTEM_I2C_SDA = pin1;
         Option.SYSTEM_I2C_SCL = pin2;
@@ -6270,7 +6311,8 @@ void MIPS16 cmd_option(void)
         }
         getcsargs(&tp, 7);
         if (argc != 7)
-            error("Syntax");
+            SyntaxError();
+        ;
         unsigned char code;
         if (!(code = codecheck(argv[0])))
             argv[0] += 2;
@@ -6278,36 +6320,36 @@ void MIPS16 cmd_option(void)
         if (!code)
             pin1 = codemap(pin1);
         if (IsInvalidPin(pin1))
-            error("Invalid pin");
+            StandardError(9);
         if (ExtCurrentConfig[pin1] != EXT_NOT_CONFIG)
-            error("Pin %/| is in use", pin1, pin1);
+            StandardErrorParam2(27, pin1, pin1);
         if (!(code = codecheck(argv[2])))
             argv[2] += 2;
         pin2 = getinteger(argv[2]);
         if (!code)
             pin2 = codemap(pin2);
         if (IsInvalidPin(pin2))
-            error("Invalid pin");
+            StandardError(9);
         if (ExtCurrentConfig[pin2] != EXT_NOT_CONFIG)
-            error("Pin %/| is in use", pin2, pin2);
+            StandardErrorParam2(27, pin2, pin2);
         if (!(code = codecheck(argv[4])))
             argv[4] += 2;
         pin3 = getinteger(argv[4]);
         if (!code)
             pin3 = codemap(pin3);
         if (IsInvalidPin(pin3))
-            error("Invalid pin");
+            StandardError(9);
         if (ExtCurrentConfig[pin3] != EXT_NOT_CONFIG)
-            error("Pin %/| is in use", pin3, pin3);
+            StandardErrorParam2(27, pin3, pin3);
         if (!(code = codecheck(argv[6])))
             argv[6] += 2;
         pin4 = getinteger(argv[6]);
         if (!code)
             pin4 = codemap(pin4);
         if (IsInvalidPin(pin4))
-            error("Invalid pin");
+            StandardError(9);
         if (ExtCurrentConfig[pin4] != EXT_NOT_CONFIG)
-            error("Pin %/| is in use", pin4, pin4);
+            StandardErrorParam2(27, pin4, pin4);
         if (pin1 == pin2 || pin1 == pin3 || pin1 == pin4 || pin2 == pin3 || pin2 == pin4 || pin3 == pin4)
             error("Pins must be unique");
         Option.INT1pin = pin1;
@@ -6325,7 +6367,7 @@ void MIPS16 cmd_option(void)
         if (checkstring(tp, (unsigned char *)"DISABLE"))
         {
             if (CurrentLinePtr)
-                error("Invalid in a program");
+                StandardError(10);
             if ((Option.SD_CS && Option.SD_CLK_PIN == 0) || Option.TOUCH_CS || Option.LCD_CS || Option.CombinedCS)
                 error("In use");
             disable_systemspi();
@@ -6336,9 +6378,10 @@ void MIPS16 cmd_option(void)
         }
         getcsargs(&tp, 5);
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         if (argc != 5)
-            error("Syntax");
+            SyntaxError();
+        ;
         if (Option.SYSTEM_CLK)
             error("SYSTEM SPI already configured");
         unsigned char code;
@@ -6348,27 +6391,27 @@ void MIPS16 cmd_option(void)
         if (!code)
             pin1 = codemap(pin1);
         if (IsInvalidPin(pin1))
-            error("Invalid pin");
+            StandardError(9);
         if (ExtCurrentConfig[pin1] != EXT_NOT_CONFIG)
-            error("Pin %/| is in use", pin1, pin1);
+            StandardErrorParam2(27, pin1, pin1);
         if (!(code = codecheck(argv[2])))
             argv[2] += 2;
         pin2 = getinteger(argv[2]);
         if (!code)
             pin2 = codemap(pin2);
         if (IsInvalidPin(pin2))
-            error("Invalid pin");
+            StandardError(9);
         if (ExtCurrentConfig[pin2] != EXT_NOT_CONFIG)
-            error("Pin %/| is in use", pin2, pin2);
+            StandardErrorParam2(27, pin2, pin2);
         if (!(code = codecheck(argv[4])))
             argv[4] += 2;
         pin3 = getinteger(argv[4]);
         if (!code)
             pin3 = codemap(pin3);
         if (IsInvalidPin(pin3))
-            error("Invalid pin");
+            StandardError(9);
         if (ExtCurrentConfig[pin3] != EXT_NOT_CONFIG)
-            error("Pin %/| is in use", pin3, pin3);
+            StandardErrorParam2(27, pin3, pin3);
         if (!(PinDef[pin1].mode & SPI0SCK && PinDef[pin2].mode & SPI0TX && PinDef[pin3].mode & SPI0RX) &&
             !(PinDef[pin1].mode & SPI1SCK && PinDef[pin2].mode & SPI1TX && PinDef[pin3].mode & SPI1RX))
             error("Not valid SPI pins");
@@ -6400,7 +6443,7 @@ void MIPS16 cmd_option(void)
         if (checkstring(tp, (unsigned char *)"DISABLE"))
         {
             if (CurrentLinePtr)
-                error("Invalid in a program");
+                StandardError(10);
             if (Option.LCD_CS)
                 error("In use");
             disable_lcdspi();
@@ -6411,9 +6454,10 @@ void MIPS16 cmd_option(void)
         }
         getcsargs(&tp, 5);
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         if (argc != 5)
-            error("Syntax");
+            SyntaxError();
+        ;
         if (Option.LCD_CLK && !(Option.LCD_CLK == Option.SYSTEM_CLK))
             error("LCD SPI already configured");
         unsigned char code;
@@ -6423,27 +6467,27 @@ void MIPS16 cmd_option(void)
         if (!code)
             pin1 = codemap(pin1);
         if (IsInvalidPin(pin1))
-            error("Invalid pin");
+            StandardError(9);
         if (ExtCurrentConfig[pin1] != EXT_NOT_CONFIG)
-            error("Pin %/| is in use", pin1, pin1);
+            StandardErrorParam2(27, pin1, pin1);
         if (!(code = codecheck(argv[2])))
             argv[2] += 2;
         pin2 = getinteger(argv[2]);
         if (!code)
             pin2 = codemap(pin2);
         if (IsInvalidPin(pin2))
-            error("Invalid pin");
+            StandardError(9);
         if (ExtCurrentConfig[pin2] != EXT_NOT_CONFIG)
-            error("Pin %/| is in use", pin2, pin2);
+            StandardErrorParam2(27, pin2, pin2);
         if (!(code = codecheck(argv[4])))
             argv[4] += 2;
         pin3 = getinteger(argv[4]);
         if (!code)
             pin3 = codemap(pin3);
         if (IsInvalidPin(pin3))
-            error("Invalid pin");
+            StandardError(9);
         if (ExtCurrentConfig[pin3] != EXT_NOT_CONFIG)
-            error("Pin %/| is in use", pin3, pin3);
+            StandardErrorParam2(27, pin3, pin3);
         if (!(PinDef[pin1].mode & SPI0SCK && PinDef[pin2].mode & SPI0TX && PinDef[pin3].mode & SPI0RX) &&
             !(PinDef[pin1].mode & SPI1SCK && PinDef[pin2].mode & SPI1TX && PinDef[pin3].mode & SPI1RX))
             error("Not valid SPI pins");
@@ -6464,7 +6508,7 @@ void MIPS16 cmd_option(void)
     tp = checkstring(cmdline, (unsigned char *)"SDCARD");
     int pin1, pin2, pin3, pin4;
     if (CurrentLinePtr)
-        error("Invalid in a program");
+        StandardError(10);
     if (tp)
     {
         if (checkstring(tp, (unsigned char *)"DISABLE"))
@@ -6494,10 +6538,12 @@ void MIPS16 cmd_option(void)
         getcsargs(&tp, 7);
 #ifdef PICOMITEVGA
         if (!(argc == 7))
-            error("Syntax");
+            SyntaxError();
+        ;
 #else
         if (!(argc == 1 || argc == 7))
-            error("Syntax");
+            SyntaxError();
+        ;
 #endif
         if (Option.SD_CS || Option.CombinedCS)
             error("SDcard already configured");
@@ -6510,9 +6556,9 @@ void MIPS16 cmd_option(void)
         if (!code)
             pin4 = codemap(pin4);
         if (IsInvalidPin(pin4))
-            error("Invalid pin");
+            StandardError(9);
         if (ExtCurrentConfig[pin4] != EXT_NOT_CONFIG)
-            error("Pin %/| is in use", pin4, pin4);
+            StandardErrorParam2(27, pin4, pin4);
         Option.SD_CS = pin4;
         Option.SDspeed = 12;
         Option.SD_CLK_PIN = 0;
@@ -6526,27 +6572,27 @@ void MIPS16 cmd_option(void)
             if (!code)
                 pin1 = codemap(pin1);
             if (IsInvalidPin(pin1))
-                error("Invalid pin");
+                StandardError(9);
             if (ExtCurrentConfig[pin1] != EXT_NOT_CONFIG)
-                error("Pin %/| is in use", pin1, pin1);
+                StandardErrorParam2(27, pin1, pin1);
             if (!(code = codecheck(argv[4])))
                 argv[4] += 2;
             pin2 = getinteger(argv[4]);
             if (!code)
                 pin2 = codemap(pin2);
             if (IsInvalidPin(pin2))
-                error("Invalid pin");
+                StandardError(9);
             if (ExtCurrentConfig[pin2] != EXT_NOT_CONFIG)
-                error("Pin %/| is in use", pin2, pin2);
+                StandardErrorParam2(27, pin2, pin2);
             if (!(code = codecheck(argv[6])))
                 argv[6] += 2;
             pin3 = getinteger(argv[6]);
             if (!code)
                 pin3 = codemap(pin3);
             if (IsInvalidPin(pin3))
-                error("Invalid pin");
+                StandardError(9);
             if (ExtCurrentConfig[pin3] != EXT_NOT_CONFIG)
-                error("Pin %/| is in use", pin3, pin3);
+                StandardErrorParam2(27, pin3, pin3);
 #ifdef PICOMITEVGA
             if (PinDef[pin1].mode & SPI0SCK && PinDef[pin2].mode & SPI0TX && PinDef[pin3].mode & SPI0RX && !Option.SYSTEM_CLK)
             {
@@ -6582,9 +6628,10 @@ void MIPS16 cmd_option(void)
     {
         getcsargs(&tp, 1);
         if (!(argc == 1))
-            error("Syntax");
+            SyntaxError();
+        ;
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         int fnbr = FindFreeFileNbr();
         if (!InitSDCard())
             return;
@@ -6607,9 +6654,10 @@ void MIPS16 cmd_option(void)
     {
         getcsargs(&tp, 1);
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         if (!(argc == 1))
-            error("Syntax");
+            SyntaxError();
+        ;
         int fnbr = FindFreeFileNbr();
         int fsize;
         if (!InitSDCard())
@@ -6649,7 +6697,7 @@ void MIPS16 cmd_option(void)
     if (tp)
     {
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         if (Option.LIBRARY_FLASH_SIZE == MAX_PROG_SIZE)
         {
             uint32_t j = FLASH_TARGET_OFFSET + FLASH_ERASE_SIZE + SAVEDVARS_FLASH_SIZE + ((MAXFLASHSLOTS - 1) * MAX_PROG_SIZE);
@@ -6943,7 +6991,8 @@ void MIPS16 fun_info(void)
             return;
         }
         else
-            error("Syntax");
+            SyntaxError();
+        ;
     }
     else if (*ep == 'd' || *ep == 'D')
     {
@@ -6986,7 +7035,8 @@ void MIPS16 fun_info(void)
             return;
         }
         else
-            error("Syntax");
+            SyntaxError();
+        ;
     }
     else if (*ep == 'e' || *ep == 'E')
     {
@@ -7030,7 +7080,8 @@ void MIPS16 fun_info(void)
             return;
         }
         else
-            error("Syntax");
+            SyntaxError();
+        ;
     }
     else if (*ep == 'f' || *ep == 'F')
     {
@@ -7116,7 +7167,8 @@ void MIPS16 fun_info(void)
             return;
         }
         else
-            error("Syntax");
+            SyntaxError();
+        ;
     }
     else if (*ep == 'h' || *ep == 'H')
     {
@@ -7139,7 +7191,8 @@ void MIPS16 fun_info(void)
             return;
         }
         else
-            error("Syntax");
+            SyntaxError();
+        ;
     }
     else if (checkstring(ep, (unsigned char *)"ID"))
     {
@@ -7475,7 +7528,8 @@ void MIPS16 fun_info(void)
 #endif
         }
         else
-            error("Syntax");
+            SyntaxError();
+        ;
     }
     else if (*ep == 'p' || *ep == 'P')
     {
@@ -7583,7 +7637,8 @@ void MIPS16 fun_info(void)
             if (!(code = codecheck((unsigned char *)string)))
                 string += 2;
             else
-                error("Syntax");
+                SyntaxError();
+            ;
             pin = getinteger((unsigned char *)string);
             if (!code)
                 pin = codemap(pin);
@@ -7596,7 +7651,7 @@ void MIPS16 fun_info(void)
             }
 #endif
             if (IsInvalidPin(pin))
-                error("Invalid pin");
+                StandardError(9);
             iret = pin;
             targ = T_INT;
             return;
@@ -7634,7 +7689,8 @@ void MIPS16 fun_info(void)
         {
             getcsargs(&tp, 3);
             if (argc != 3)
-                error("Syntax");
+                SyntaxError();
+            ;
 #ifdef rp2350
             int channel = getint(argv[0], 0, rp2350a ? 7 : 11);
 #else
@@ -7735,7 +7791,8 @@ void MIPS16 fun_info(void)
             return;
         }
         else
-            error("Syntax");
+            SyntaxError();
+        ;
     }
     else if (*ep == 's' || *ep == 'S')
     {
@@ -7825,7 +7882,8 @@ void MIPS16 fun_info(void)
 #endif
         }
         else
-            error("Syntax");
+            SyntaxError();
+        ;
     }
 #ifndef PICOMITEVGA
     else if (checkstring(ep, (unsigned char *)"TOUCH"))
@@ -7881,7 +7939,8 @@ void MIPS16 fun_info(void)
             return;
         }
         else
-            error("Syntax");
+            SyntaxError();
+        ;
     }
     else if (checkstring(ep, (unsigned char *)"WRITEBUFF"))
     {
@@ -7906,7 +7965,8 @@ void MIPS16 fun_info(void)
         return;
     }
     else
-        error("Syntax");
+        SyntaxError();
+    ;
 }
 
 void cmd_watchdog(void)
@@ -7936,7 +7996,7 @@ void cmd_watchdog(void)
     {
         i = getinteger(cmdline);
         if (i < 1)
-            error("Invalid argument");
+            SyntaxError();
         WDTimer = i;
     }
 }
@@ -7968,7 +8028,8 @@ void cmd_cpu(void)
         sleep_us(totalseconds * 1000000);
     }
     else
-        error("Syntax");
+        SyntaxError();
+    ;
 }
 void cmd_csubinterrupt(void)
 {
@@ -8041,8 +8102,7 @@ void cmd_poke(void)
     void *pp;
     if ((p = checkstring(cmdline, (unsigned char *)"DISPLAY")))
     {
-        if (!Option.DISPLAY_TYPE)
-            error("Display not configured");
+        CheckDisplay();
         if ((q = checkstring(p, (unsigned char *)"HRES")))
         {
             HRes = getint(q, 0, 1920);
@@ -8088,7 +8148,8 @@ void cmd_poke(void)
                 error("Display not supported");
 #endif
         }
-        error("Syntax");
+        SyntaxError();
+        ;
     }
     else
     {
@@ -8096,7 +8157,7 @@ void cmd_poke(void)
         if ((p = checkstring(argv[0], (unsigned char *)"BYTE")))
         {
             if (argc != 3)
-                error("Argument count");
+                StandardError(2);
             uint32_t a = GetPokeAddr(p);
             uint8_t *padd = (uint8_t *)(a);
             *padd = getinteger(argv[2]);
@@ -8105,7 +8166,7 @@ void cmd_poke(void)
         if ((p = checkstring(argv[0], (unsigned char *)"SHORT")))
         {
             if (argc != 3)
-                error("Argument count");
+                StandardError(2);
             uint32_t a = GetPokeAddr(p);
             if (a % 2)
                 error("Address not divisible by 2");
@@ -8117,7 +8178,7 @@ void cmd_poke(void)
         if ((p = checkstring(argv[0], (unsigned char *)"WORD")))
         {
             if (argc != 3)
-                error("Argument count");
+                StandardError(2);
             uint32_t a = GetPokeAddr(p);
             if (a % 4)
                 error("Address not divisible by 4");
@@ -8129,7 +8190,7 @@ void cmd_poke(void)
         if ((p = checkstring(argv[0], (unsigned char *)"INTEGER")))
         {
             if (argc != 3)
-                error("Argument count");
+                StandardError(2);
             uint32_t a = GetPokeAddr(p);
             if (a % 8)
                 error("Address not divisible by 8");
@@ -8140,7 +8201,7 @@ void cmd_poke(void)
         if ((p = checkstring(argv[0], (unsigned char *)"FLOAT")))
         {
             if (argc != 3)
-                error("Argument count");
+                StandardError(2);
             uint32_t a = GetPokeAddr(p);
             if (a % 8)
                 error("Address not divisible by 8");
@@ -8150,7 +8211,7 @@ void cmd_poke(void)
         }
 
         if (argc != 5)
-            error("Argument count");
+            StandardError(2);
 
         if (checkstring(argv[0], (unsigned char *)"VARTBL"))
         {
@@ -8161,7 +8222,7 @@ void cmd_poke(void)
         {
             pp = findvar(p, V_FIND | V_EMPTY_OK | V_NOFIND_ERR);
             if (g_vartbl[g_VarIndex].type & T_CONST)
-                error("Cannot change a constant");
+                StandardError(22);
             *((char *)pp + (unsigned int)getinteger(argv[2])) = getinteger(argv[4]);
             return;
         }
@@ -8217,7 +8278,8 @@ void fun_peek(void)
     if ((p = checkstring(argv[0], (unsigned char *)"INT8")))
     {
         if (argc != 1)
-            error("Syntax");
+            SyntaxError();
+        ;
         iret = *(unsigned char *)GetPeekAddr(p);
         targ = T_INT;
         return;
@@ -8226,7 +8288,8 @@ void fun_peek(void)
     if ((p = checkstring(argv[0], (unsigned char *)"VARADDR")))
     {
         if (argc != 1)
-            error("Syntax");
+            SyntaxError();
+        ;
         pp = findvar(p, V_FIND | V_EMPTY_OK | V_NOFIND_ERR);
         iret = (unsigned int)pp;
         targ = T_INT;
@@ -8236,7 +8299,8 @@ void fun_peek(void)
     if ((p = checkstring(argv[0], (unsigned char *)"BP")))
     {
         if (argc != 1)
-            error("Syntax");
+            SyntaxError();
+        ;
         findvar(p, V_FIND | V_NOFIND_ERR);
         if (!(g_vartbl[g_VarIndex].type & T_INT))
             error("Not integer variable");
@@ -8248,7 +8312,8 @@ void fun_peek(void)
     if ((p = checkstring(argv[0], (unsigned char *)"WP")))
     {
         if (argc != 1)
-            error("Syntax");
+            SyntaxError();
+        ;
         findvar(p, V_FIND | V_NOFIND_ERR);
         if (!(g_vartbl[g_VarIndex].type & T_INT))
             error("Not integer variable");
@@ -8262,7 +8327,8 @@ void fun_peek(void)
     if ((p = checkstring(argv[0], (unsigned char *)"SP")))
     {
         if (argc != 1)
-            error("Syntax");
+            SyntaxError();
+        ;
         findvar(p, V_FIND | V_NOFIND_ERR);
         if (!(g_vartbl[g_VarIndex].type & T_INT))
             error("Not integer variable");
@@ -8284,7 +8350,8 @@ void fun_peek(void)
     if ((p = checkstring(argv[0], (unsigned char *)"VARHEADER")))
     {
         if (argc != 1)
-            error("Syntax");
+            SyntaxError();
+        ;
         pp = findvar(p, V_FIND | V_EMPTY_OK | V_NOFIND_ERR);
         iret = (unsigned int)&g_vartbl[g_VarIndex].name[0];
         targ = T_INT;
@@ -8295,7 +8362,8 @@ void fun_peek(void)
     {
         int i, j;
         if (argc != 1)
-            error("Syntax");
+            SyntaxError();
+        ;
         i = FindSubFun(p, true); // search for a function first
         if (i == -1)
             i = FindSubFun(p, false); // and if not found try for a subroutine
@@ -8304,14 +8372,15 @@ void fun_peek(void)
             skipspace(p);
             getcsargs(&p, 1);
             if (argc != 1)
-                error("Syntax");
+                SyntaxError();
+            ;
             unsigned char *q = getCstring(argv[0]);
             i = FindSubFun(q, true); // search for a function first
             if (i == -1)
                 i = FindSubFun(q, false); // and if not found try for a subroutine
         }
         if (i == -1 || !(commandtbl_decode(subfun[i]) == cmdCSUB))
-            error("Invalid argument");
+            SyntaxError();
         // search through program flash and the library looking for a match to the function being called
         j = GetCFunAddr((int *)CFunctionFlash, i, ProgMemory);
         if (!j)
@@ -8326,7 +8395,8 @@ void fun_peek(void)
     if ((p = checkstring(argv[0], (unsigned char *)"WORD")))
     {
         if (argc != 1)
-            error("Syntax");
+            SyntaxError();
+        ;
         iret = *(unsigned int *)(GetPeekAddr(p) & 0b11111111111111111111111111111100);
         targ = T_INT;
         return;
@@ -8334,7 +8404,8 @@ void fun_peek(void)
     if ((p = checkstring(argv[0], (unsigned char *)"SHORT")))
     {
         if (argc != 1)
-            error("Syntax");
+            SyntaxError();
+        ;
         iret = (unsigned long long int)(*(unsigned short *)(GetPeekAddr(p) & 0b11111111111111111111111111111110));
         targ = T_INT;
         return;
@@ -8342,7 +8413,8 @@ void fun_peek(void)
     if ((p = checkstring(argv[0], (unsigned char *)"INTEGER")))
     {
         if (argc != 1)
-            error("Syntax");
+            SyntaxError();
+        ;
         iret = *(uint64_t *)(GetPeekAddr(p) & 0xFFFFFFF8);
         targ = T_INT;
         return;
@@ -8351,14 +8423,16 @@ void fun_peek(void)
     if ((p = checkstring(argv[0], (unsigned char *)"FLOAT")))
     {
         if (argc != 1)
-            error("Syntax");
+            SyntaxError();
+        ;
         fret = *(MMFLOAT *)(GetPeekAddr(p) & 0xFFFFFFF8);
         targ = T_NBR;
         return;
     }
 
     if (argc != 3)
-        error("Syntax");
+        SyntaxError();
+    ;
 
     if ((checkstring(argv[0], (unsigned char *)"PROGMEM")))
     {
@@ -8384,7 +8458,7 @@ void fun_format(void)
     int inspec;
     getcsargs(&ep, 3);
     if (argc % 2 == 0)
-        error("Invalid syntax");
+        SyntaxError();
     if (argc == 3)
         fmt = getCstring(argv[2]);
     else

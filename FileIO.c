@@ -433,7 +433,7 @@ void MIPS16 cmd_disk(void)
         FatFSFileSystem = FatFSFileSystemSave = 1;
         return;
     }
-    error((char *)"Syntax");
+    SyntaxError();
 }
 #if defined(rp2350) && !defined(PICOMITEWEB)
 extern unsigned int mmap[HEAP_MEMORY_SIZE / PAGESIZE / PAGESPERWORD];
@@ -483,7 +483,8 @@ void MIPS16 cmd_psram(void)
                 ListProgram(ProgMemory, true);
             }
             else
-                error("Syntax");
+                SyntaxError();
+            ;
             ProgMemory = (unsigned char *)flash_progmemory;
         }
         else
@@ -532,14 +533,16 @@ void MIPS16 cmd_psram(void)
         int overwrite = 0;
         getcsargs(&p, 5);
         if (!(argc == 3 || argc == 5))
-            error("Syntax");
+            SyntaxError();
+        ;
         int i = getint(argv[0], 1, MAXRAMSLOTS);
         if (argc == 5)
         {
             if (checkstring(argv[4], (unsigned char *)"O") || checkstring(argv[4], (unsigned char *)"OVERWRITE"))
                 overwrite = 1;
             else
-                error("Syntax");
+                SyntaxError();
+            ;
         }
         uint8_t *c = (uint8_t *)(PSRAMblock + ((i - 1) * MAX_PROG_SIZE));
         if (*c != 0x0 && overwrite == 0)
@@ -562,7 +565,7 @@ void MIPS16 cmd_psram(void)
     else if ((p = checkstring(cmdline, (unsigned char *)"LOAD")))
     {
         if (CurrentLinePtr)
-            error("Invalid in program");
+            StandardError(10);
         int j = (Option.PROG_FLASH_SIZE >> 2), i = getint(p, 1, MAXRAMSLOTS);
         disable_interrupts_pico();
         flash_range_erase(PROGSTART, MAX_PROG_SIZE);
@@ -628,7 +631,8 @@ void MIPS16 cmd_psram(void)
         nextstmt = (unsigned char *)ProgMemory;
     }
     else
-        error("Syntax");
+        SyntaxError();
+    ;
 }
 #endif
 void MIPS16 cmd_flash(void)
@@ -637,7 +641,7 @@ void MIPS16 cmd_flash(void)
     if ((p = checkstring(cmdline, (unsigned char *)"ERASE ALL")))
     {
         if (CurrentLinePtr)
-            error("Invalid in program");
+            StandardError(10);
         //        uint32_t j = FLASH_TARGET_OFFSET + FLASH_ERASE_SIZE + SAVEDVARS_FLASH_SIZE;
         int k = MAXFLASHSLOTS;
         if (Option.LIBRARY_FLASH_SIZE == MAX_PROG_SIZE)
@@ -654,10 +658,10 @@ void MIPS16 cmd_flash(void)
     else if ((p = checkstring(cmdline, (unsigned char *)"ERASE")))
     {
         if (CurrentLinePtr)
-            error("Invalid in program");
+            StandardError(10);
         int i = getint(p, 1, MAXFLASHSLOTS);
         if (Option.LIBRARY_FLASH_SIZE == MAX_PROG_SIZE && i == MAXFLASHSLOTS)
-            error("Library is using Slot % ", MAXFLASHSLOTS);
+            StandardErrorParam(25, MAXFLASHSLOTS);
         uint32_t j = FLASH_TARGET_OFFSET + FLASH_ERASE_SIZE + SAVEDVARS_FLASH_SIZE + ((i - 1) * MAX_PROG_SIZE);
         uSec(250000);
         disable_interrupts_pico();
@@ -667,10 +671,10 @@ void MIPS16 cmd_flash(void)
     else if ((p = checkstring(cmdline, (unsigned char *)"OVERWRITE")))
     {
         if (CurrentLinePtr)
-            error("Invalid in program");
+            StandardError(10);
         int i = getint(p, 1, MAXFLASHSLOTS);
         if (Option.LIBRARY_FLASH_SIZE == MAX_PROG_SIZE && i == MAXFLASHSLOTS)
-            error("Library is using Slot % ", MAXFLASHSLOTS);
+            StandardErrorParam(25, MAXFLASHSLOTS);
         uint32_t j = FLASH_TARGET_OFFSET + FLASH_ERASE_SIZE + SAVEDVARS_FLASH_SIZE + ((i - 1) * MAX_PROG_SIZE);
         uSec(250000);
         disable_interrupts_pico();
@@ -704,7 +708,7 @@ void MIPS16 cmd_flash(void)
         {
             int i = getint(argv[0], 1, MAXFLASHSLOTS);
             if (Option.LIBRARY_FLASH_SIZE == MAX_PROG_SIZE && i == MAXFLASHSLOTS)
-                error("Library is using Slot % ", MAXFLASHSLOTS);
+                StandardErrorParam(25, MAXFLASHSLOTS);
             ProgMemory = (unsigned char *)(flash_target_contents + (i - 1) * MAX_PROG_SIZE);
             if (Option.DISPLAY_CONSOLE && (SPIREAD || Option.NoScroll))
             {
@@ -719,7 +723,8 @@ void MIPS16 cmd_flash(void)
                 ListProgram(ProgMemory, true);
             }
             else
-                error("Syntax");
+                SyntaxError();
+            ;
             ProgMemory = (unsigned char *)flash_progmemory;
         }
         else
@@ -776,7 +781,8 @@ void MIPS16 cmd_flash(void)
         int fsize;
         getcsargs(&p, 1);
         if (!(argc == 1))
-            error("Syntax");
+            SyntaxError();
+        ;
         int fnbr = FindFreeFileNbr();
         if (!InitSDCard())
             return;
@@ -817,17 +823,19 @@ void MIPS16 cmd_flash(void)
         int fsize, overwrite = 0;
         getcsargs(&p, 5);
         if (!(argc == 3 || argc == 5))
-            error("Syntax");
+            SyntaxError();
+        ;
         int i = getint(argv[0], 1, MAXFLASHSLOTS);
         if (argc == 5)
         {
             if (checkstring(argv[4], (unsigned char *)"O") || checkstring(argv[4], (unsigned char *)"OVERWRITE"))
                 overwrite = 1;
             else
-                error("Syntax");
+                SyntaxError();
+            ;
         }
         if (Option.LIBRARY_FLASH_SIZE == MAX_PROG_SIZE && i == MAXFLASHSLOTS)
-            error("Library is using Slot % ", MAXFLASHSLOTS);
+            StandardErrorParam(25, MAXFLASHSLOTS);
         uint32_t *c = (uint32_t *)(flash_target_contents + (i - 1) * MAX_PROG_SIZE);
         if (*c != 0xFFFFFFFF && overwrite == 0)
             error("Already programmed");
@@ -863,10 +871,10 @@ void MIPS16 cmd_flash(void)
     else if ((p = checkstring(cmdline, (unsigned char *)"SAVE")))
     {
         if (CurrentLinePtr)
-            error("Invalid in program");
+            StandardError(10);
         int i = getint(p, 1, MAXFLASHSLOTS);
         if (Option.LIBRARY_FLASH_SIZE == MAX_PROG_SIZE && i == MAXFLASHSLOTS)
-            error("Library is using Slot % ", MAXFLASHSLOTS);
+            StandardErrorParam(25, MAXFLASHSLOTS);
         uint32_t *c = (uint32_t *)(flash_target_contents + (i - 1) * MAX_PROG_SIZE);
         if (*c != 0xFFFFFFFF)
             error("Already programmed");
@@ -898,10 +906,10 @@ void MIPS16 cmd_flash(void)
     else if ((p = checkstring(cmdline, (unsigned char *)"LOAD")))
     {
         if (CurrentLinePtr)
-            error("Invalid in program");
+            StandardError(10);
         int j = (Option.PROG_FLASH_SIZE >> 2), i = getint(p, 1, MAXFLASHSLOTS);
         if (Option.LIBRARY_FLASH_SIZE == MAX_PROG_SIZE && i == MAXFLASHSLOTS)
-            error("Library is using Slot % ", MAXFLASHSLOTS);
+            StandardErrorParam(25, MAXFLASHSLOTS);
         disable_interrupts_pico();
         flash_range_erase(PROGSTART, MAX_PROG_SIZE);
         enable_interrupts_pico();
@@ -942,7 +950,7 @@ void MIPS16 cmd_flash(void)
             error("Invalid at command prompt");
         int i = getint(p, 0, MAXFLASHSLOTS);
         if (Option.LIBRARY_FLASH_SIZE == MAX_PROG_SIZE && i == MAXFLASHSLOTS)
-            error("Library is using Slot % ", MAXFLASHSLOTS);
+            StandardErrorParam(25, MAXFLASHSLOTS);
         if (i)
             ProgMemory = (unsigned char *)(flash_target_contents + (i - 1) * MAX_PROG_SIZE);
         else
@@ -955,7 +963,7 @@ void MIPS16 cmd_flash(void)
     {
         int i = getint(p, 0, MAXFLASHSLOTS);
         if (Option.LIBRARY_FLASH_SIZE == MAX_PROG_SIZE && i == MAXFLASHSLOTS)
-            error("Library is using Slot % ", MAXFLASHSLOTS);
+            StandardErrorParam(25, MAXFLASHSLOTS);
         if (i)
             ProgMemory = (unsigned char *)(flash_target_contents + (i - 1) * MAX_PROG_SIZE);
         else
@@ -970,7 +978,8 @@ void MIPS16 cmd_flash(void)
         nextstmt = (unsigned char *)ProgMemory;
     }
     else
-        error("Syntax");
+        SyntaxError();
+    ;
 }
 /*
  * @cond
@@ -1018,7 +1027,7 @@ void cmd_LoadImage(unsigned char *p)
     // get the command line arguments
     getcsargs(&p, 5); // this MUST be the first executable line in the function
     if (argc == 0)
-        error("Argument count");
+        StandardError(2);
     if (!InitSDCard())
         return;
 
@@ -1051,7 +1060,7 @@ void cmd_LoadDitheredImage(unsigned char *p)
     // get the command line arguments
     getcsargs(&p, 11); // this MUST be the first executable line in the function
     if (argc == 0)
-        error("Argument count");
+        StandardError(2);
     if (!InitSDCard())
         return;
 
@@ -1063,7 +1072,7 @@ void cmd_LoadDitheredImage(unsigned char *p)
     if (argc >= 5 && *argv[4])
         yOrigin = getinteger(argv[4]); // get the y origin (optional) argument
     if (argc >= 7 && *argv[6])
-        mode = getint(argv[6], 0,3); // get the y origin (optional) argument
+        mode = getint(argv[6], 0, 3); // get the y origin (optional) argument
     if (argc >= 9 && *argv[8])
         xRead = getint(argv[8], 0, 1919); // get the y origin (optional) argument
     if (argc == 11)
@@ -1074,7 +1083,7 @@ void cmd_LoadDitheredImage(unsigned char *p)
     fnbr = FindFreeFileNbr();
     if (!BasicFileOpen((char *)p, fnbr, FA_READ))
         return;
-    ReadAndDisplayBMP(fnbr, mode & 1, (mode & 2)>>1, xRead, yRead, xOrigin, yOrigin);
+    ReadAndDisplayBMP(fnbr, mode & 1, (mode & 2) >> 1, xRead, yRead, xOrigin, yOrigin);
     FileClose(fnbr);
     if (Option.Refresh)
         Display_Refresh();
@@ -1135,7 +1144,7 @@ void cmd_LoadJPGImage(unsigned char *p)
     // get the command line arguments
     getcsargs(&p, 5); // this MUST be the first executable line in the function
     if (argc == 0)
-        error("Argument count");
+        StandardError(2);
     if (!InitSDCard())
         return;
 
@@ -1327,7 +1336,8 @@ void fun_dir(void)
     if (argc != 0)
         dirflags = -1;
     if (!(argc <= 3))
-        error("Syntax");
+        SyntaxError();
+    ;
 
     if (argc == 3)
     {
@@ -1644,7 +1654,7 @@ void MIPS16 cmd_kill(void)
         if (pp[0] == 0)
             strcpy(pp, "*");
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         FatFSFileSystem = t - 1;
         if (!InitSDCard())
             error((char *)FErrorMsg[20]); // setup the SD card
@@ -1841,12 +1851,13 @@ void cmd_seek(void)
     int fnbr, idx;
     getcsargs(&cmdline, 5);
     if (argc != 3)
-        error("Syntax");
+        SyntaxError();
+    ;
     if (*argv[0] == '#')
         argv[0]++;
     fnbr = getinteger(argv[0]);
     if (fnbr < 1 || fnbr > MAXOPENFILES || FileTable[fnbr].com <= MAXCOMPORTS)
-        error("File number");
+        StandardError(18);
     if (FileTable[fnbr].com == 0)
         error("File number #% is not open", fnbr);
     if (!InitSDCard())
@@ -1867,7 +1878,8 @@ void MIPS16 cmd_name(void)
     char qnew[FF_MAX_LFN] = {0};
     getargs(&cmdline, 3, (unsigned char *)ss); // macro must be the first executable stmt in a block
     if (argc != 3)
-        error("Syntax");
+        SyntaxError();
+    ;
     old = (char *)getFstring(argv[0]); // get the old name
     if (drivecheck(old, &i) != FatFSFileSystem + 1)
         error("Only valid on current drive");
@@ -1954,7 +1966,8 @@ void MIPS16 cmd_save(void)
             error("SAVE IMAGE not available on this display");
         pp = getFstring(argv[0]);
         if (argc != 1 && argc != 9)
-            error("Syntax");
+            SyntaxError();
+        ;
         if (strchr((char *)pp, '.') == NULL)
             strcat((char *)pp, ".bmp");
         if (!BasicFileOpen((char *)pp, fnbr, FA_WRITE | FA_CREATE_ALWAYS))
@@ -2131,7 +2144,8 @@ void MIPS16 cmd_save(void)
                 error("SAVE IMAGE not available on this display");
             pp = getFstring(argv[0]);
             if (argc != 1 && argc != 9)
-                error("Syntax");
+                SyntaxError();
+            ;
             if (strchr((char *)pp, '.') == NULL)
                 strcat((char *)pp, ".bmp");
             if (!BasicFileOpen((char *)pp, fnbr, FA_WRITE | FA_CREATE_ALWAYS))
@@ -2256,7 +2270,8 @@ void MIPS16 cmd_save(void)
             error("SAVE IMAGE not available on this display");
         pp = getFstring(argv[0]);
         if (argc != 1 && argc != 9)
-            error("Syntax");
+            SyntaxError();
+        ;
         if (strchr((char *)pp, '.') == NULL)
             strcat((char *)pp, ".bmp");
         if (!BasicFileOpen((char *)pp, fnbr, FA_WRITE | FA_CREATE_ALWAYS))
@@ -2438,10 +2453,12 @@ void importfile(char *pp, char *tp, char **p, uint32_t buf, int convertdebug, bo
     fnbr = FindFreeFileNbr();
     char *q;
     if ((q = strchr((char *)tp, 34)) == 0)
-        error("Syntax");
+        SyntaxError();
+    ;
     q++;
     if ((q = strchr(q, 34)) == 0)
-        error("Syntax");
+        SyntaxError();
+    ;
     fname = (char *)getFstring((unsigned char *)tp);
     fnbr = FindFreeFileNbr();
     if (strchr((char *)fname, '.') == NULL)
@@ -2482,7 +2499,7 @@ void importfile(char *pp, char *tp, char **p, uint32_t buf, int convertdebug, bo
         {
             FreeMemorySafe((void **)&buf);
             FreeMemorySafe((void **)&dlist);
-            error("Not enough memory");
+            StandardError(29);
         }
         memset(buff, 0, 256);
         MMgetline(fnbr, (char *)buff); // get the input line
@@ -2673,7 +2690,7 @@ int FileLoadCMM2Program(char *fname, bool message)
         {
             FreeMemorySafe((void **)&buf);
             FreeMemorySafe((void **)&dlist);
-            error("Not enough memory");
+            StandardError(29);
         }
         memset(buff, 0, 256);
         MMgetline(fnbr, (char *)buff); // get the input line
@@ -2869,7 +2886,7 @@ int FileLoadProgram(unsigned char *fname, bool chain)
     while (!FileEOF(fnbr))
     { // while waiting for the end of file
         if ((p - buf) >= EDIT_BUFFER_SIZE - 2048 - 512)
-            error("Not enough memory");
+            StandardError(29);
         c = FileGetChar(fnbr) & 0x7f;
         if (isprint(c) || c == '\r' || c == '\n' || c == TAB)
         {
@@ -3298,7 +3315,7 @@ exiterror:
     MemWriteByte(0);
     MemWriteByte(0); // terminate the program in flash
     MemWriteClose();
-    error("Not enough memory");
+    StandardError(29);
 }
 int MemLoadProgram(unsigned char *fname, unsigned char *ram)
 {
@@ -3342,7 +3359,7 @@ int MemLoadProgram(unsigned char *fname, unsigned char *ram)
     while (!FileEOF(fnbr))
     { // while waiting for the end of file
         if ((p - buf) >= EDIT_BUFFER_SIZE - 2048 - 512)
-            error("Not enough memory");
+            StandardError(29);
         c = FileGetChar(fnbr) & 0x7f;
         if (isprint(c) || c == '\r' || c == '\n' || c == TAB)
         {
@@ -3362,9 +3379,10 @@ void MIPS16 loadCMM2(unsigned char *p, bool autorun, bool message)
 {
     getcsargs(&p, 1);
     if (!(argc & 1) || argc == 0)
-        error("Syntax");
+        SyntaxError();
+    ;
     if (CurrentLinePtr != NULL && !autorun)
-        error("Invalid in a program");
+        StandardError(10);
 
     if (!FileLoadCMM2Program((char *)argv[0], message))
         return;
@@ -3394,10 +3412,11 @@ void MIPS16 cmd_loadCMM2(void)
         if (mytoupper(*argv[2]) == 'R')
             autorun = true;
         else
-            error("Syntax");
+            SyntaxError();
+        ;
     }
     else if (CurrentLinePtr != NULL)
-        error("Invalid in a program");
+        StandardError(10);
 
     loadCMM2(argv[0], autorun, true);
 }
@@ -3414,7 +3433,7 @@ void LoadPNG(unsigned char *p)
     // get the command line arguments
     getcsargs(&p, 9); // this MUST be the first executable line in the function
     if (argc == 0)
-        error("Argument count");
+        StandardError(2);
     if (!InitSDCard())
         return;
 
@@ -3533,18 +3552,21 @@ void MIPS16 cmd_load(void)
     p = checkstring(cmdline, (unsigned char *)"IMAGE");
     if (p)
     {
+        CheckDisplay();
         cmd_LoadImage(p);
         return;
     }
     p = checkstring(cmdline, (unsigned char *)"DITHERED");
     if (p)
     {
+        CheckDisplay();
         cmd_LoadDitheredImage(p);
         return;
     }
     p = checkstring(cmdline, (unsigned char *)"JPG");
     if (p)
     {
+        CheckDisplay();
         cmd_LoadJPGImage(p);
         return;
     }
@@ -3552,6 +3574,7 @@ void MIPS16 cmd_load(void)
     p = checkstring(cmdline, (unsigned char *)"PNG");
     if (p)
     {
+        CheckDisplay();
         LoadPNG(p);
         return;
     }
@@ -3559,16 +3582,18 @@ void MIPS16 cmd_load(void)
     getcsargs(&cmdline, 3);
     CloseAudio(1);
     if (!(argc & 1) || argc == 0)
-        error("Syntax");
+        SyntaxError();
+    ;
     if (argc == 3)
     {
         if (mytoupper(*argv[2]) == 'R')
             autorun = true;
         else
-            error("Syntax");
+            SyntaxError();
+        ;
     }
     else if (CurrentLinePtr != NULL)
-        error("Invalid in a program");
+        StandardError(10);
     if (!FileLoadProgram(argv[0], false))
     {
         SetFont(oldfont);
@@ -3632,7 +3657,23 @@ char __not_in_flash_func(FileGetChar)(int fnbr)
         return ch;
     }
 }
-
+// bulk read data. For Fat file system can only be used if FileGetchar has not been called first
+int __not_in_flash_func(FileGetdata)(int fnbr, void *buff, int count, unsigned int *read)
+{
+    if (filesource[fnbr] == FATFSFILE)
+    {
+        FSerror = f_read(FileTable[fnbr].fptr, buff, count, (UINT *)read);
+    }
+    else
+    {
+        FSerror = lfs_file_read(&lfs, FileTable[fnbr].lfsptr, buff, count);
+        *read = FSerror;
+        if (FSerror > 0)
+            FSerror = 0;
+        ErrorCheck(fnbr);
+    }
+    return FSerror;
+}
 char __not_in_flash_func(FilePutChar)(char c, int fnbr)
 {
     if (filesource[fnbr] == FLASHFILE)
@@ -3712,9 +3753,9 @@ unsigned char MMfputc(unsigned char c, int fnbr)
     if (fnbr == 0)
         return MMputchar(c, 1); // accessing the console
     if (fnbr < 1 || fnbr > MAXOPENFILES)
-        error("File number");
+        StandardError(18);
     if (FileTable[fnbr].com == 0)
-        error("File number is not open");
+        StandardError(19);
     if (FileTable[fnbr].com > MAXCOMPORTS)
         return FilePutChar(c, fnbr);
     else
@@ -3726,9 +3767,9 @@ int MMfgetc(int fnbr)
     if (fnbr == 0)
         return MMgetchar(); // accessing the console
     if (fnbr < 1 || fnbr > MAXOPENFILES)
-        error("File number");
+        StandardError(18);
     if (FileTable[fnbr].com == 0)
-        error("File number is not open");
+        StandardError(19);
     if (FileTable[fnbr].com > MAXCOMPORTS)
         ch = FileGetChar(fnbr);
     else
@@ -3741,9 +3782,9 @@ int MMfeof(int fnbr)
     if (fnbr == 0)
         return (kbhitConsole() == 0); // accessing the console
     if (fnbr < 1 || fnbr > MAXOPENFILES)
-        error("File number");
+        StandardError(18);
     if (FileTable[fnbr].com == 0)
-        error("File number is not open");
+        StandardError(19);
     if (FileTable[fnbr].com > MAXCOMPORTS)
         return FileEOF(fnbr);
     else
@@ -3935,7 +3976,7 @@ void getfullfilename(char *fname, char *q)
 int BasicFileOpen(char *fname, int fnbr, int mode)
 {
     if (fnbr < 1 || fnbr > MAXOPENFILES)
-        error("File number");
+        StandardError(18);
     if (FileTable[fnbr].com != 0)
         error("File number already open");
     char q[FF_MAX_LFN] = {0};
@@ -4187,7 +4228,8 @@ void MIPS16 cmd_copy(void)
     {
         getargs(&tp, 3, (unsigned char *)ss);
         if (argc != 3)
-            error("Syntax");
+            SyntaxError();
+        ;
         fromfile = getFstring(argv[0]);
         tofile = getFstring(argv[2]);
         B2A(fromfile, tofile);
@@ -4198,7 +4240,8 @@ void MIPS16 cmd_copy(void)
     {
         getargs(&tp, 3, (unsigned char *)ss);
         if (argc != 3)
-            error("Syntax");
+            SyntaxError();
+        ;
         fromfile = getFstring(argv[0]);
         tofile = getFstring(argv[2]);
         A2B(fromfile, tofile);
@@ -4209,7 +4252,8 @@ void MIPS16 cmd_copy(void)
     {
         getargs(&tp, 3, (unsigned char *)ss);
         if (argc != 3)
-            error("Syntax");
+            SyntaxError();
+        ;
         fromfile = getFstring(argv[0]);
         tofile = getFstring(argv[2]);
         A2A(fromfile, tofile);
@@ -4220,7 +4264,8 @@ void MIPS16 cmd_copy(void)
     {
         getargs(&tp, 3, (unsigned char *)ss);
         if (argc != 3)
-            error("Syntax");
+            SyntaxError();
+        ;
         fromfile = getFstring(argv[0]);
         tofile = getFstring(argv[2]);
         B2B(fromfile, tofile);
@@ -4229,7 +4274,8 @@ void MIPS16 cmd_copy(void)
 
     getargs(&p, 3, (unsigned char *)ss);
     if (argc != 3)
-        error("Syntax");
+        SyntaxError();
+    ;
     fromfile = getFstring(argv[0]);
     tofile = getFstring(argv[2]);
     int tofilesystem;
@@ -4283,7 +4329,7 @@ void MIPS16 cmd_copy(void)
         if (pp[0] == 0)
             strcpy(pp, "*");
         if (CurrentLinePtr)
-            error("Invalid in a program");
+            StandardError(10);
         FatFSFileSystem = t - 1;
         if (!InitSDCard())
             error((char *)FErrorMsg[20]); // setup the SD card
@@ -4573,7 +4619,7 @@ void getfullfilepath(char *p, char *q)
 
 void MIPS16 cmd_files(void)
 {
-    //    if(CurrentLinePtr) error("Invalid in a program");
+    //    if(CurrentLinePtr) StandardError(10);
     int waste = 0, t = FatFSFileSystem + 1;
     unsigned char cmdbuffer[STRINGSIZE] = {0};
     unsigned char *cmdbuf = cmdbuffer;
@@ -4610,7 +4656,8 @@ void MIPS16 cmd_files(void)
     {
         getcsargs(&cmdbuf, 3);
         if (!(argc == 1 || argc == 3))
-            error("Syntax");
+            SyntaxError();
+        ;
         p = (char *)getFstring(argv[0]);
         i = strlen(p) - 1;
         while (i > 0 && !(p[i] == '/'))
@@ -4640,7 +4687,8 @@ void MIPS16 cmd_files(void)
             else if (checkstring(argv[2], (unsigned char *)"TYPE"))
                 sortorder = 3;
             else
-                error("Syntax");
+                SyntaxError();
+            ;
         }
     }
     if (CurrentLinePtr)
@@ -5158,7 +5206,7 @@ void cmd_autosave(void)
     int count = 0;
     uint64_t timeout;
     if (CurrentLinePtr)
-        error("Invalid in a program");
+        StandardError(10);
     char *tp = (char *)checkstring(cmdline, (unsigned char *)"APPEND");
     if (tp)
     {
@@ -5196,7 +5244,8 @@ void cmd_autosave(void)
         if (mytoupper(*cmdline) == 'C')
             crunch = true;
         else
-            error("Syntax");
+            SyntaxError();
+        ;
     }
     ClearProgram(false); // clear any leftovers from the previous program
     p = buf = GetTempMemory(EDIT_BUFFER_SIZE);
@@ -5212,7 +5261,7 @@ readin:;
         if (p == buf && c == '\n')
             continue; // throw away an initial line feed which can follow the command
         if ((p - buf) >= EDIT_BUFFER_SIZE)
-            error("Not enough memory");
+            StandardError(29);
         if (isprint(c) || c == '\r' || c == '\n' || c == TAB)
         {
             if (c == TAB)
@@ -5269,7 +5318,7 @@ void cmd_autosave(void)
     int c, prevc = 0, crunch = false;
     int count = 0;
     uint64_t timeout;
-    if (CurrentLinePtr)error("Invalid in a program");
+    if (CurrentLinePtr)StandardError(10);
     if(!checkstring(cmdline,(unsigned char *)"APPEND")){
         FlashLoad=0;
         uSec(250000);
@@ -5282,7 +5331,7 @@ void cmd_autosave(void)
             if (mytoupper(*cmdline) == 'C')
                 crunch = true;
             else
-                error("Syntax");
+                SyntaxError();;
         }
         CrunchData(&p, 0); // initialise the crunch data subroutine
         }
@@ -5319,7 +5368,7 @@ void cmd_autosave(void)
         if (p == buf && c == '\n')
             continue; // throw away an initial line feed which can follow the command
         if ((p - buf) >= EDIT_BUFFER_SIZE-2048)
-            error("Not enough memory");
+            StandardError(29);
         if (isprint(c) || c == '\r' || c == '\n' || c == TAB)
         {
             if (c == TAB)
@@ -5411,7 +5460,8 @@ void cmd_open(void)
     {                                              // start a new block
         getargs(&cmdline, 7, (unsigned char *)ss); // macro must be the first executable stmt in a block
         if (!(argc == 3 || argc == 5 || argc == 7))
-            error("Syntax");
+            SyntaxError();
+        ;
         fname = (char *)getFstring(argv[0]);
 
         // check that it is a serial port that we are opening
@@ -5428,10 +5478,12 @@ void cmd_open(void)
             MMFLOAT timeadjust = 0.0;
             argv[2]++;
             if (!((*argv[2] == 'P') || (*argv[2] == 'p')))
-                error("Syntax");
+                SyntaxError();
+            ;
             argv[2]++;
             if (!((*argv[2] == 'S') || (*argv[2] == 's')))
-                error("Syntax");
+                SyntaxError();
+            ;
             if (argc >= 5)
                 timeadjust = getnumber(argv[4]);
             if (timeadjust < -12.0 || timeadjust > 14.0)
@@ -5459,7 +5511,7 @@ void cmd_open(void)
                 argv[2]++;
             fnbr = getint(argv[2], 1, MAXOPENFILES);
             if (FileTable[fnbr].com != 0)
-                error("Already open");
+                StandardError(31);
             SerialOpen((unsigned char *)fname);
             FileTable[fnbr].com = fname[3] - '0';
         }
@@ -5471,7 +5523,8 @@ void fun_inputstr(void)
     int i, nbr, fnbr;
     getcsargs(&ep, 3);
     if (argc != 3)
-        error("Syntax");
+        SyntaxError();
+    ;
     sret = GetTempMemory(STRINGSIZE); // this will last for the life of the command
     nbr = getint(argv[0], 1, MAXSTRLEN);
     if (*argv[2] == '#')
@@ -5485,9 +5538,9 @@ void fun_inputstr(void)
     else
     {
         if (fnbr < 1 || fnbr > MAXOPENFILES)
-            error("File number");
+            StandardError(18);
         if (FileTable[fnbr].com == 0)
-            error("File number is not open");
+            StandardError(19);
         targ = T_STR;
         if (FileTable[fnbr].com > MAXCOMPORTS)
         {
@@ -5507,7 +5560,8 @@ void fun_eof(void)
     int fnbr;
     getcsargs(&ep, 1);
     if (argc == 0)
-        error("Syntax");
+        SyntaxError();
+    ;
     if (*argv[0] == '#')
         argv[0]++;
     fnbr = getinteger(argv[0]);
@@ -5527,9 +5581,9 @@ void cmd_flush(void)
     else
     {
         if (fnbr < 1 || fnbr > MAXOPENFILES)
-            error("File number");
+            StandardError(18);
         if (FileTable[fnbr].com == 0)
-            error("File number is not open");
+            StandardError(19);
         if (FileTable[fnbr].com > MAXCOMPORTS)
         {
             if (filesource[fnbr] == FATFSFILE)
@@ -5552,7 +5606,8 @@ void fun_loc(void)
     int fnbr;
     getcsargs(&ep, 1);
     if (argc == 0)
-        error("Syntax");
+        SyntaxError();
+    ;
     if (*argv[0] == '#')
         argv[0]++;
     fnbr = getinteger(argv[0]);
@@ -5561,9 +5616,9 @@ void fun_loc(void)
     else
     {
         if (fnbr < 1 || fnbr > MAXOPENFILES)
-            error("File number");
+            StandardError(18);
         if (FileTable[fnbr].com == 0)
-            error("File number is not open");
+            StandardError(19);
         if (FileTable[fnbr].com > MAXCOMPORTS)
         {
             if (filesource[fnbr] == FLASHFILE)
@@ -5594,7 +5649,8 @@ void fun_lof(void)
     int fnbr;
     getcsargs(&ep, 1);
     if (argc == 0)
-        error("Syntax");
+        SyntaxError();
+    ;
     if (*argv[0] == '#')
         argv[0]++;
     fnbr = getinteger(argv[0]);
@@ -5603,9 +5659,9 @@ void fun_lof(void)
     else
     {
         if (fnbr < 1 || fnbr > MAXOPENFILES)
-            error("File number");
+            StandardError(18);
         if (FileTable[fnbr].com == 0)
-            error("File number is not open");
+            StandardError(19);
         if (FileTable[fnbr].com > MAXCOMPORTS)
         {
             if (filesource[fnbr] == FATFSFILE)
@@ -5630,17 +5686,20 @@ void cmd_close(void)
     int i, fnbr;
     getcsargs(&cmdline, (MAX_ARG_COUNT * 2) - 1); // macro must be the first executable stmt in a block
     if ((argc & 0x01) == 0)
-        error("Syntax");
+        SyntaxError();
+    ;
     for (i = 0; i < argc; i += 2)
     {
         if ((*argv[i] == 'G') || (*argv[i] == 'g'))
         {
             argv[i]++;
             if (!((*argv[i] == 'P') || (*argv[i] == 'p')))
-                error("Syntax");
+                SyntaxError();
+            ;
             argv[i]++;
             if (!((*argv[i] == 'S') || (*argv[i] == 's')))
-                error("Syntax");
+                SyntaxError();
+            ;
             if (!GPSfnbr)
                 error("Not open");
             SerialClose(FileTable[GPSfnbr].com);
@@ -5677,7 +5736,7 @@ void cmd_close(void)
                 argv[i]++;
             fnbr = getint(argv[i], 1, MAXOPENFILES);
             if (FileTable[fnbr].com == 0)
-                error("File number is not open");
+                StandardError(19);
             while (SerialTxStatus(FileTable[fnbr].com) && !MMAbort)
                 ; // wait for anything in the buffer to be transmitted
             if (FileTable[fnbr].com > MAXCOMPORTS)
@@ -6008,7 +6067,7 @@ void MIPS16 cmd_var(void)
                 if (type & T_INT)
                     nbr2 *= sizeof(long long int);
                 if (nbr2 != nbr)
-                    error("Array size");
+                    StandardError(17);
             }
             else
             {
@@ -6030,7 +6089,7 @@ void MIPS16 cmd_var(void)
     {
         getcsargs(&p, (MAX_ARG_COUNT * 2) - 1); // macro must be the first executable stmt in a block
         if (argc && (argc & 0x01) == 0)
-            error("Invalid syntax");
+            SyntaxError();
 
         // befor we start, run through the arguments checking for errors
         // before we start, run through the arguments checking for errors
@@ -6040,7 +6099,7 @@ void MIPS16 cmd_var(void)
             VarDataList[i / 2] = findvar(argv[i], V_NOFIND_ERR | V_EMPTY_OK);
             VarList[i / 2] = g_VarIndex;
             if ((g_vartbl[g_VarIndex].type & (T_CONST | T_PTR)) || g_vartbl[g_VarIndex].level != 0)
-                error("Invalid variable");
+                StandardError(6);
             p = &argv[i][strlen((char *)argv[i]) - 1]; // pointer to the last char
             if (*p == ')')
             { // strip off any empty brackets which indicate an array
@@ -6050,7 +6109,7 @@ void MIPS16 cmd_var(void)
                 if (*p == '(')
                     *p = 0;
                 else
-                    error("Invalid variable");
+                    StandardError(6);
             }
         }
         // load the current variable save table into RAM
@@ -6146,7 +6205,7 @@ void MIPS16 cmd_var(void)
             if ((uint32_t)realflashpointer + XIP_BASE - (uint32_t)SavedVarsFlash + 36 + nbr > SAVEDVARS_FLASH_SIZE)
             {
                 FlashWriteClose();
-                error("Not enough memory");
+                StandardError(29);
             }
             FlashWriteByte(type); // save its type
             for (j = 0, p = g_vartbl[g_VarIndex].name; *p && j < MAXVARLEN; p++, j++)
@@ -6165,7 +6224,7 @@ void MIPS16 cmd_var(void)
         FlashWriteClose();
         return;
     }
-    error("Unknown command");
+    StandardError(36);
 }
 /*
  * @cond
