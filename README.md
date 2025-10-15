@@ -1,4 +1,4 @@
-# PicoMite for Bobricius' PICOMPUTER
+# PicoMite for Bobricius' PICOMPUTER (unofficial release)
 <br>
 <img width="600" height="450" alt="IMG_Picomputer" src="https://github.com/user-attachments/assets/1c327f12-428c-4841-b9d6-982cc56d3df3" /><br>
 
