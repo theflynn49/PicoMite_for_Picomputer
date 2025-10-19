@@ -487,7 +487,6 @@ void cmd_gui(void)
     unsigned char *p;
 
     CheckDisplay();
-    error("Display not configured");
 
     if ((p = checkstring(cmdline, (unsigned char *)"PAGE")))
     {
