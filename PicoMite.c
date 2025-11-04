@@ -47,6 +47,7 @@ extern "C"
 #include "hardware/pwm.h"
 #include "configuration.h"
 #include <malloc.h>
+#include "KMatrix.h"
 
 #ifdef rp2350
 #include "hardware/structs/qmi.h"
@@ -531,6 +532,7 @@ uint8_t PSRAMpin;
     {
         static int when = 0;
         static int classicread = 0, nunchuckread = 0;
+	bool hasSerial ;
 #ifndef USBKEYBOARD
         static int keyread = 0;
 #endif
@@ -555,13 +557,13 @@ uint8_t PSRAMpin;
         }
 #ifndef USBKEYBOARD
         // === Console CDC processing ===
-        if (tud_cdc_connected() &&
+        hasSerial = (tud_cdc_connected() &&
             (Option.SerialConsole == 0 || Option.SerialConsole > 4) &&
-            Option.Telnet != -1)
+            Option.Telnet != -1) ;
+	// if (hasSerial)
         {
-
-            int c;
-            while ((c = tud_cdc_read_char()) != -1)
+            int c ;
+            while (((c=getMatrix(0))!=-1) || (hasSerial && (c = tud_cdc_read_char()) != -1))
             {
                 ConsoleRxBuf[ConsoleRxBufHead] = c;
 
