@@ -47,6 +47,7 @@ extern "C"
 #include "hardware/pwm.h"
 #include "configuration.h"
 #include <malloc.h>
+#include "KMatrix.h"
 
 #ifdef rp2350
 #include "hardware/structs/qmi.h"
@@ -586,6 +587,33 @@ uint8_t PSRAMpin;
             hid_app_task();
         }
 #endif
+        {
+	    int c = -1 ;
+            uint32_t space = console_rx_buf_space();
+	    if (space > 1) c = getMatrix(0) ;
+	    if (c != -1)
+            {
+                // Process received bytes
+                    // Check for break key
+                   if (BreakKey && c == BreakKey)
+                   {
+                       MMAbort = true;
+                       ConsoleRxBufHead = ConsoleRxBufTail; // Flush buffer
+                       // break;                               // Exit loop after abort
+                   }
+                   // Check for key interrupt (signal only, don't buffer)
+                   else if (c == keyselect && KeyInterrupt != NULL)
+                   {
+                       Keycomplete = true;
+                   }
+                   // Normal character - store in buffer
+                   else
+                   {
+                       ConsoleRxBuf[ConsoleRxBufHead] = c;
+                       ConsoleRxBufHead = (ConsoleRxBufHead + 1) % CONSOLE_RX_BUF_SIZE;
+                   }
+	    }
+	}
 #ifndef USBKEYBOARD
         if (tud_cdc_connected() &&
             (Option.SerialConsole == 0 || Option.SerialConsole > 4) &&

@@ -45,6 +45,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 #include "hardware/structs/pwm.h"
 #include "aes.h"
 #include "re.h"
+#include "KMatrix.h"
 #ifdef rp2350
 #include "pico/rand.h"
 #endif
@@ -8891,6 +8892,7 @@ int __not_in_flash_func(check_interrupt)(void)
     if (Option.KeyboardConfig)
         CheckKeyboard();
 #endif
+    (void)getMatrix(1) ;
     if (!InterruptUsed)
         return 0; // quick exit if there are no interrupts set
     if (InterruptReturn != NULL || CurrentLinePtr == NULL)
